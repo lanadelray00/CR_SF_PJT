@@ -26,7 +26,7 @@ parameters.minOtsuStdDev = 5.0             # 잡음 줄이기
 parameters.perspectiveRemoveIgnoredMarginPerCell = 0.13
 
 
-marker_length = 0.03
+marker_length = 0.08
 
 # rvecs, tvecs save
 rvecs_list, tvecs_list = [], []
@@ -110,11 +110,11 @@ while True:
     corners, ids, rejected = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
     if ids is not None:
-        rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(corners, 0.03, camera_matrix, dist_coeffs)
+        rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(corners, marker_length, camera_matrix, dist_coeffs)
 
         for i in range(len(ids)):
             aruco.drawDetectedMarkers(frame, corners, ids)
-            cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvecs[i], tvecs[i], 0.03)
+            cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvecs[i], tvecs[i], 0.02)
 
             # 화면 표시용 텍스트
             cX, cY = int(corners[i][0][0][0]), int(corners[i][0][0][1])
