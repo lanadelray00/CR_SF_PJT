@@ -31,7 +31,7 @@ marker_length = 0.03
 # rvecs, tvecs save
 rvecs_list, tvecs_list = [], []
 ee_pose = []
-save_dir = "t_rvec_ee_list_1"
+save_dir = "t_rvec_ee_list"
 count = 1
 os.makedirs(f"/home/choigh/WS/CR_SF_PJT/src/01_CR_PJT/cr_test/{save_dir}", exist_ok=True)
 data = np.load('/home/choigh/WS/Test_Tools_code/calib_data.npz')
@@ -125,7 +125,7 @@ while True:
             
             # 스페이스바 누르면 저장
             if key == 32:  # Spacebar
-                tvecs_list.append([count,ids[i][0], tvecs[i][0][0], tvecs[i][0][1], tvecs[i][0][2]])
+                tvecs_list.append([count, ids[i][0], tvecs[i][0][0], tvecs[i][0][1], tvecs[i][0][2]])
                 rvecs_list.append([count, rvecs[i][0][0], rvecs[i][0][1], rvecs[i][0][2]])
                 print(f"Num {count} | X={tvecs[i][0][0]:.3f}  Y={tvecs[i][0][1]:.3f}  Z={tvecs[i][0][2]:.3f}")
                 
@@ -140,12 +140,12 @@ while True:
     cv2.imshow("Aruco Detection", frame)
 
     if key == 27:  # ESC to exit
-        np.savez(os.path.join(f"/home/choigh/WS/CR_SF_PJT/src/01_CR_PJT/cr_test/{save_dir}", "t_rvec_ee_list_1.npz"),
+        np.savez(os.path.join(f"/home/choigh/WS/CR_SF_PJT/src/01_CR_PJT/cr_test/{save_dir}", "t_rvec_ee_list.npz"),
              tvecs=np.array(tvecs_list),
              rvecs=np.array(rvecs_list),
              ee_pose=np.array(ee_pose))
 
-        print(f"\nSaved {len(tvecs_list)} marker + EE samples to {save_dir}/t_rvec_ee_list_1.npz")
+        print(f"\nSaved {len(tvecs_list)} marker + EE samples to {save_dir}/t_rvec_ee_list.npz")
         break
 
 cap.release()
