@@ -1,0 +1,29 @@
+[0.007s] Invoking command in '/home/choigh/ws_cr_sf/build/cr_pjt': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/choigh/ws_cr_sf/build/cr_pjt -- -j20 -l20
+[0.043s] [ 50%] Built target robot_interface
+[0.053s] [35m[1mConsolidate compiler generated dependencies of target robot_interface_test[0m
+[0.067s] [ 75%] [32mBuilding CXX object CMakeFiles/robot_interface_test.dir/src/robot_interface_test.cpp.o[0m
+[3.745s] [100%] [32m[1mLinking CXX executable robot_interface_test[0m
+[3.956s] [100%] Built target robot_interface_test
+[3.963s] Invoked command in '/home/choigh/ws_cr_sf/build/cr_pjt' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/choigh/ws_cr_sf/build/cr_pjt -- -j20 -l20
+[3.969s] Invoking command in '/home/choigh/ws_cr_sf/build/cr_pjt': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/choigh/ws_cr_sf/build/cr_pjt
+[3.974s] -- Install configuration: ""
+[3.974s] -- Execute custom install script
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/lib/cr_pjt/librobot_interface.a
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/lib/cr_pjt/robot_interface_test
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/ament_index/resource_index/package_run_dependencies/cr_pjt
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/ament_index/resource_index/parent_prefix_path/cr_pjt
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/ament_prefix_path.sh
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/ament_prefix_path.dsv
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/path.sh
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/path.dsv
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.bash
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.sh
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.zsh
+[3.975s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.dsv
+[3.975s] -- Symlinking: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/package.dsv
+[3.980s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/ament_index/resource_index/packages/cr_pjt
+[3.980s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/cmake/ament_cmake_export_include_directories-extras.cmake
+[3.980s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/cmake/cr_pjtConfig.cmake
+[3.980s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/cmake/cr_pjtConfig-version.cmake
+[3.980s] -- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/package.xml
+[3.981s] Invoked command in '/home/choigh/ws_cr_sf/build/cr_pjt' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/choigh/ws_cr_sf/build/cr_pjt

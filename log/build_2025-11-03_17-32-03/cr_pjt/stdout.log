@@ -1,0 +1,27 @@
+[ 25%] [32mBuilding CXX object CMakeFiles/robot_interface.dir/src/robot_interface.cpp.o[0m
+[ 50%] [32m[1mLinking CXX static library librobot_interface.a[0m
+[ 50%] Built target robot_interface
+[35m[1mConsolidate compiler generated dependencies of target robot_interface_test[0m
+[ 75%] [32mBuilding CXX object CMakeFiles/robot_interface_test.dir/src/robot_interface_test.cpp.o[0m
+[100%] [32m[1mLinking CXX executable robot_interface_test[0m
+[100%] Built target robot_interface_test
+-- Install configuration: ""
+-- Execute custom install script
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/lib/cr_pjt/librobot_interface.a
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/lib/cr_pjt/robot_interface_test
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/ament_index/resource_index/package_run_dependencies/cr_pjt
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/ament_index/resource_index/parent_prefix_path/cr_pjt
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/ament_prefix_path.sh
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/ament_prefix_path.dsv
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/path.sh
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/path.dsv
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.bash
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.sh
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.zsh
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.dsv
+-- Symlinking: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/package.dsv
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/ament_index/resource_index/packages/cr_pjt
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/cmake/ament_cmake_export_include_directories-extras.cmake
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/cmake/cr_pjtConfig.cmake
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/cmake/cr_pjtConfig-version.cmake
+-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/package.xml

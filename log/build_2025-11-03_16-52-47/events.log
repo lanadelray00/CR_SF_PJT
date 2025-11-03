@@ -1,0 +1,121 @@
+[0.000000] (-) TimerEvent: {}
+[0.000088] (cr_pjt) JobQueued: {'identifier': 'cr_pjt', 'dependencies': OrderedDict()}
+[0.000105] (cr_pjt) JobStarted: {'identifier': 'cr_pjt'}
+[0.004975] (cr_pjt) JobProgress: {'identifier': 'cr_pjt', 'progress': 'cmake'}
+[0.005280] (cr_pjt) JobProgress: {'identifier': 'cr_pjt', 'progress': 'build'}
+[0.005699] (cr_pjt) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/choigh/ws_cr_sf/build/cr_pjt', '--', '-j20', '-l20'], 'cwd': '/home/choigh/ws_cr_sf/build/cr_pjt', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('LANGUAGE', 'en_US.UTF-8'), ('USER', 'choigh'), ('LC_TIME', 'ko_KR.UTF-8'), ('ROS_NAMESPACE', 'turtlebot3'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/choigh/manipul_ws/install/open_manipulator_x_gui/lib:/home/choigh/manipul_ws/install/dynamixel_sdk_custom_interfaces/lib:/home/choigh/manipul_ws/install/dynamixel_hardware_interface/lib:/home/choigh/manipul_ws/install/dynamixel_sdk/lib:/home/choigh/manipul_ws/install/dynamixel_interfaces/lib:/home/choigh/moveit_ws/install/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib:/usr/local/cuda/lib64:'), ('HOME', '/home/choigh'), ('OLDPWD', '/home/choigh'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/terminator.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('LC_MONETARY', 'ko_KR.UTF-8'), ('MANAGERPID', '1370'), ('SYSTEMD_EXEC_PID', '1830'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1001/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator21a9d5db22c73a993ff0b42f64b396873'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '4712'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/choigh/ws_cr_sf/install:/home/choigh/manipul_ws/install:/home/choigh/moveit_ws/install'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'choigh'), ('JOURNAL_STREAM', '8:42639'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'choigh'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/home/choigh/moveit_ws/install/bin:/opt/ros/humble/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/choigh:@/tmp/.ICE-unix/1807,unix/choigh:/tmp/.ICE-unix/1807'), ('INVOCATION_ID', '6890489ce6f94f6684705e038a12938a'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'ko_KR.UTF-8'), ('XDG_RUNTIME_DIR', '/run/user/1001'), ('DISPLAY', ':0'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('IBUS_DISABLE_SNOOPER', '1'), ('LC_TELEPHONE', 'ko_KR.UTF-8'), ('RMW_IMPLEMENTATION', 'rmw_fastrtps_cpp'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1001/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1001/keyring/ssh'), ('ROS_DOMAIN_ID', '96'), ('AMENT_PREFIX_PATH', '/home/choigh/ws_cr_sf/install/cr_pjt:/home/choigh/manipul_ws/install/open_manipulator:/home/choigh/manipul_ws/install/open_manipulator_x_teleop:/home/choigh/manipul_ws/install/open_manipulator_x_playground:/home/choigh/manipul_ws/install/open_manipulator_x_moveit_config:/home/choigh/manipul_ws/install/open_manipulator_x_gui:/home/choigh/manipul_ws/install/open_manipulator_x_bringup:/home/choigh/manipul_ws/install/open_manipulator_x_description:/home/choigh/manipul_ws/install/move_test:/home/choigh/manipul_ws/install/dynamixel_sdk_examples:/home/choigh/manipul_ws/install/dynamixel_sdk_custom_interfaces:/home/choigh/manipul_ws/install/dynamixel_hardware_interface:/home/choigh/manipul_ws/install/dynamixel_sdk:/home/choigh/manipul_ws/install/dynamixel_interfaces:/home/choigh/moveit_ws/install:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'ko_KR.UTF-8'), ('TERMINATOR_UUID', 'urn:uuid:a6054003-97ad-4d96-a885-4527928da596'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('LC_MEASUREMENT', 'ko_KR.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1001/gnupg/S.gpg-agent:0:1'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('LC_IDENTIFICATION', 'ko_KR.UTF-8'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/choigh/ws_cr_sf/build/cr_pjt'), ('TURTLEBOT3_MODEL', 'burger'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/choigh/manipul_ws/install/dynamixel_sdk_custom_interfaces/local/lib/python3.10/dist-packages:/home/choigh/manipul_ws/install/dynamixel_sdk/local/lib/python3.10/dist-packages:/home/choigh/manipul_ws/install/dynamixel_interfaces/local/lib/python3.10/dist-packages:/home/choigh/moveit_ws/install/local/lib/python3.10/dist-packages:/home/choigh/moveit_ws/install/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'ko_KR.UTF-8'), ('LC_PAPER', 'ko_KR.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CMAKE_PREFIX_PATH', '/home/choigh/ws_cr_sf/install/cr_pjt:/home/choigh/manipul_ws/install/open_manipulator:/home/choigh/manipul_ws/install/open_manipulator_x_teleop:/home/choigh/manipul_ws/install/open_manipulator_x_playground:/home/choigh/manipul_ws/install/open_manipulator_x_moveit_config:/home/choigh/manipul_ws/install/open_manipulator_x_gui:/home/choigh/manipul_ws/install/open_manipulator_x_bringup:/home/choigh/manipul_ws/install/open_manipulator_x_description:/home/choigh/manipul_ws/install/move_test:/home/choigh/manipul_ws/install/dynamixel_sdk_examples:/home/choigh/manipul_ws/install/dynamixel_sdk_custom_interfaces:/home/choigh/manipul_ws/install/dynamixel_hardware_interface:/home/choigh/manipul_ws/install/dynamixel_sdk:/home/choigh/manipul_ws/install/dynamixel_interfaces:/home/choigh/moveit_ws/install:/opt/ros/humble')]), 'shell': False}
+[0.033181] (cr_pjt) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target robot_interface\x1b[0m\n'}
+[0.047573] (cr_pjt) StdoutLine: {'line': b'[ 25%] \x1b[32mBuilding CXX object CMakeFiles/robot_interface.dir/src/robot_interface.cpp.o\x1b[0m\n'}
+[0.099405] (-) TimerEvent: {}
+[0.199700] (-) TimerEvent: {}
+[0.300024] (-) TimerEvent: {}
+[0.400316] (-) TimerEvent: {}
+[0.500568] (-) TimerEvent: {}
+[0.600787] (-) TimerEvent: {}
+[0.701037] (-) TimerEvent: {}
+[0.801346] (-) TimerEvent: {}
+[0.901632] (-) TimerEvent: {}
+[1.001960] (-) TimerEvent: {}
+[1.102173] (-) TimerEvent: {}
+[1.202490] (-) TimerEvent: {}
+[1.302722] (-) TimerEvent: {}
+[1.403052] (-) TimerEvent: {}
+[1.503353] (-) TimerEvent: {}
+[1.603585] (-) TimerEvent: {}
+[1.703826] (-) TimerEvent: {}
+[1.804063] (-) TimerEvent: {}
+[1.904362] (-) TimerEvent: {}
+[2.004592] (-) TimerEvent: {}
+[2.104868] (-) TimerEvent: {}
+[2.205193] (-) TimerEvent: {}
+[2.305510] (-) TimerEvent: {}
+[2.405833] (-) TimerEvent: {}
+[2.506094] (-) TimerEvent: {}
+[2.606339] (-) TimerEvent: {}
+[2.706634] (-) TimerEvent: {}
+[2.806873] (-) TimerEvent: {}
+[2.907203] (-) TimerEvent: {}
+[3.007531] (-) TimerEvent: {}
+[3.107853] (-) TimerEvent: {}
+[3.208174] (-) TimerEvent: {}
+[3.308417] (-) TimerEvent: {}
+[3.408655] (-) TimerEvent: {}
+[3.508903] (-) TimerEvent: {}
+[3.609203] (-) TimerEvent: {}
+[3.709443] (-) TimerEvent: {}
+[3.809769] (-) TimerEvent: {}
+[3.910099] (-) TimerEvent: {}
+[4.010330] (-) TimerEvent: {}
+[4.110565] (-) TimerEvent: {}
+[4.210793] (-) TimerEvent: {}
+[4.231874] (cr_pjt) StdoutLine: {'line': b'[ 50%] \x1b[32m\x1b[1mLinking CXX static library librobot_interface.a\x1b[0m\n'}
+[4.259405] (cr_pjt) StdoutLine: {'line': b'[ 50%] Built target robot_interface\n'}
+[4.266487] (cr_pjt) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target robot_interface_test\x1b[0m\n'}
+[4.280340] (cr_pjt) StdoutLine: {'line': b'[ 75%] \x1b[32mBuilding CXX object CMakeFiles/robot_interface_test.dir/src/robot_interface_test.cpp.o\x1b[0m\n'}
+[4.310958] (-) TimerEvent: {}
+[4.411262] (-) TimerEvent: {}
+[4.511563] (-) TimerEvent: {}
+[4.611799] (-) TimerEvent: {}
+[4.712095] (-) TimerEvent: {}
+[4.812355] (-) TimerEvent: {}
+[4.912697] (-) TimerEvent: {}
+[5.012987] (-) TimerEvent: {}
+[5.113344] (-) TimerEvent: {}
+[5.213653] (-) TimerEvent: {}
+[5.314009] (-) TimerEvent: {}
+[5.414279] (-) TimerEvent: {}
+[5.514584] (-) TimerEvent: {}
+[5.614866] (-) TimerEvent: {}
+[5.715147] (-) TimerEvent: {}
+[5.815429] (-) TimerEvent: {}
+[5.915721] (-) TimerEvent: {}
+[6.016107] (-) TimerEvent: {}
+[6.116482] (-) TimerEvent: {}
+[6.216847] (-) TimerEvent: {}
+[6.317228] (-) TimerEvent: {}
+[6.417597] (-) TimerEvent: {}
+[6.517886] (-) TimerEvent: {}
+[6.618172] (-) TimerEvent: {}
+[6.718490] (-) TimerEvent: {}
+[6.818819] (-) TimerEvent: {}
+[6.919164] (-) TimerEvent: {}
+[7.019501] (-) TimerEvent: {}
+[7.119868] (-) TimerEvent: {}
+[7.220234] (-) TimerEvent: {}
+[7.320627] (-) TimerEvent: {}
+[7.420987] (-) TimerEvent: {}
+[7.521387] (-) TimerEvent: {}
+[7.621723] (-) TimerEvent: {}
+[7.722026] (-) TimerEvent: {}
+[7.822345] (-) TimerEvent: {}
+[7.922591] (-) TimerEvent: {}
+[7.977481] (cr_pjt) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking CXX executable robot_interface_test\x1b[0m\n'}
+[8.022705] (-) TimerEvent: {}
+[8.122916] (-) TimerEvent: {}
+[8.175970] (cr_pjt) StdoutLine: {'line': b'[100%] Built target robot_interface_test\n'}
+[8.182749] (cr_pjt) CommandEnded: {'returncode': 0}
+[8.183535] (cr_pjt) JobProgress: {'identifier': 'cr_pjt', 'progress': 'install'}
+[8.188881] (cr_pjt) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/choigh/ws_cr_sf/build/cr_pjt'], 'cwd': '/home/choigh/ws_cr_sf/build/cr_pjt', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('LANGUAGE', 'en_US.UTF-8'), ('USER', 'choigh'), ('LC_TIME', 'ko_KR.UTF-8'), ('ROS_NAMESPACE', 'turtlebot3'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/choigh/manipul_ws/install/open_manipulator_x_gui/lib:/home/choigh/manipul_ws/install/dynamixel_sdk_custom_interfaces/lib:/home/choigh/manipul_ws/install/dynamixel_hardware_interface/lib:/home/choigh/manipul_ws/install/dynamixel_sdk/lib:/home/choigh/manipul_ws/install/dynamixel_interfaces/lib:/home/choigh/moveit_ws/install/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib:/usr/local/cuda/lib64:'), ('HOME', '/home/choigh'), ('OLDPWD', '/home/choigh'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/terminator.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('LC_MONETARY', 'ko_KR.UTF-8'), ('MANAGERPID', '1370'), ('SYSTEMD_EXEC_PID', '1830'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1001/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator21a9d5db22c73a993ff0b42f64b396873'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '4712'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/choigh/ws_cr_sf/install:/home/choigh/manipul_ws/install:/home/choigh/moveit_ws/install'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'choigh'), ('JOURNAL_STREAM', '8:42639'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'choigh'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/home/choigh/moveit_ws/install/bin:/opt/ros/humble/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/choigh:@/tmp/.ICE-unix/1807,unix/choigh:/tmp/.ICE-unix/1807'), ('INVOCATION_ID', '6890489ce6f94f6684705e038a12938a'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'ko_KR.UTF-8'), ('XDG_RUNTIME_DIR', '/run/user/1001'), ('DISPLAY', ':0'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('IBUS_DISABLE_SNOOPER', '1'), ('LC_TELEPHONE', 'ko_KR.UTF-8'), ('RMW_IMPLEMENTATION', 'rmw_fastrtps_cpp'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1001/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1001/keyring/ssh'), ('ROS_DOMAIN_ID', '96'), ('AMENT_PREFIX_PATH', '/home/choigh/ws_cr_sf/install/cr_pjt:/home/choigh/manipul_ws/install/open_manipulator:/home/choigh/manipul_ws/install/open_manipulator_x_teleop:/home/choigh/manipul_ws/install/open_manipulator_x_playground:/home/choigh/manipul_ws/install/open_manipulator_x_moveit_config:/home/choigh/manipul_ws/install/open_manipulator_x_gui:/home/choigh/manipul_ws/install/open_manipulator_x_bringup:/home/choigh/manipul_ws/install/open_manipulator_x_description:/home/choigh/manipul_ws/install/move_test:/home/choigh/manipul_ws/install/dynamixel_sdk_examples:/home/choigh/manipul_ws/install/dynamixel_sdk_custom_interfaces:/home/choigh/manipul_ws/install/dynamixel_hardware_interface:/home/choigh/manipul_ws/install/dynamixel_sdk:/home/choigh/manipul_ws/install/dynamixel_interfaces:/home/choigh/moveit_ws/install:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'ko_KR.UTF-8'), ('TERMINATOR_UUID', 'urn:uuid:a6054003-97ad-4d96-a885-4527928da596'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('LC_MEASUREMENT', 'ko_KR.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1001/gnupg/S.gpg-agent:0:1'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('LC_IDENTIFICATION', 'ko_KR.UTF-8'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/choigh/ws_cr_sf/build/cr_pjt'), ('TURTLEBOT3_MODEL', 'burger'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/choigh/manipul_ws/install/dynamixel_sdk_custom_interfaces/local/lib/python3.10/dist-packages:/home/choigh/manipul_ws/install/dynamixel_sdk/local/lib/python3.10/dist-packages:/home/choigh/manipul_ws/install/dynamixel_interfaces/local/lib/python3.10/dist-packages:/home/choigh/moveit_ws/install/local/lib/python3.10/dist-packages:/home/choigh/moveit_ws/install/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'ko_KR.UTF-8'), ('LC_PAPER', 'ko_KR.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CMAKE_PREFIX_PATH', '/home/choigh/ws_cr_sf/install/cr_pjt:/home/choigh/manipul_ws/install/open_manipulator:/home/choigh/manipul_ws/install/open_manipulator_x_teleop:/home/choigh/manipul_ws/install/open_manipulator_x_playground:/home/choigh/manipul_ws/install/open_manipulator_x_moveit_config:/home/choigh/manipul_ws/install/open_manipulator_x_gui:/home/choigh/manipul_ws/install/open_manipulator_x_bringup:/home/choigh/manipul_ws/install/open_manipulator_x_description:/home/choigh/manipul_ws/install/move_test:/home/choigh/manipul_ws/install/dynamixel_sdk_examples:/home/choigh/manipul_ws/install/dynamixel_sdk_custom_interfaces:/home/choigh/manipul_ws/install/dynamixel_hardware_interface:/home/choigh/manipul_ws/install/dynamixel_sdk:/home/choigh/manipul_ws/install/dynamixel_interfaces:/home/choigh/moveit_ws/install:/opt/ros/humble')]), 'shell': False}
+[8.193424] (cr_pjt) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[8.193692] (cr_pjt) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[8.193853] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/lib/cr_pjt/librobot_interface.a\n'}
+[8.193938] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/lib/cr_pjt/robot_interface_test\n'}
+[8.194126] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/ament_index/resource_index/package_run_dependencies/cr_pjt\n'}
+[8.194231] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/ament_index/resource_index/parent_prefix_path/cr_pjt\n'}
+[8.194430] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/ament_prefix_path.sh\n'}
+[8.194538] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/ament_prefix_path.dsv\n'}
+[8.194701] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/path.sh\n'}
+[8.194776] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/environment/path.dsv\n'}
+[8.194838] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.bash\n'}
+[8.194897] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.sh\n'}
+[8.194953] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.zsh\n'}
+[8.195011] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/local_setup.dsv\n'}
+[8.195075] (cr_pjt) StdoutLine: {'line': b'-- Symlinking: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/package.dsv\n'}
+[8.199631] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/ament_index/resource_index/packages/cr_pjt\n'}
+[8.199764] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[8.199918] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/cmake/cr_pjtConfig.cmake\n'}
+[8.199986] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/cmake/cr_pjtConfig-version.cmake\n'}
+[8.200048] (cr_pjt) StdoutLine: {'line': b'-- Up-to-date symlink: /home/choigh/ws_cr_sf/install/cr_pjt/share/cr_pjt/package.xml\n'}
+[8.200983] (cr_pjt) CommandEnded: {'returncode': 0}
+[8.209105] (cr_pjt) JobEnded: {'identifier': 'cr_pjt', 'rc': 0}
+[8.209585] (-) EventReactorShutdown: {}

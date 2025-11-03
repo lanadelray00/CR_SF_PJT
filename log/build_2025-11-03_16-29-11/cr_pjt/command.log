@@ -1,0 +1,4 @@
+Invoking command in '/home/choigh/ws_cr_sf/build/cr_pjt': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/choigh/ws_cr_sf/src/cr_pjt -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/choigh/ws_cr_sf/install/cr_pjt
+Invoked command in '/home/choigh/ws_cr_sf/build/cr_pjt' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/choigh/ws_cr_sf/src/cr_pjt -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/choigh/ws_cr_sf/install/cr_pjt
+Invoking command in '/home/choigh/ws_cr_sf/build/cr_pjt': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/choigh/ws_cr_sf/build/cr_pjt -- -j20 -l20
+Invoked command in '/home/choigh/ws_cr_sf/build/cr_pjt' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/choigh/ws_cr_sf/build/cr_pjt -- -j20 -l20

@@ -1,0 +1,2 @@
+/usr/bin/ar qc librobot_interface.a CMakeFiles/robot_interface.dir/src/robot_interface.cpp.o
+/usr/bin/ranlib librobot_interface.a

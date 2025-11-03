@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-model href="WIP" schematypens="WIP"?>
+<package format="3">
+  <name>cr_pjt</name>
+  <version>0.0.0</version>
+  <description>
+    This package provides an example for utilizing the MoveIt API with the OpenMANIPULATOR-X,
+    allowing users to practice and experiment freely.
+  </description>
+  <maintainer email="choigh0396@gmail.com">choi</maintainer>
+  <license>Apache 2.0</license>
+  <url type="website">WIP</url>
+  <url type="repository">WIP</url>
+  <url type="bugtracker">WIP</url>
+  <author email="choigh0396@gmail.com">WIP</author>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>moveit_ros_planning_interface</depend>
+  <depend>rclcpp</depend>
+  <depend>std_srvs</depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

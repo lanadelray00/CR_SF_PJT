@@ -1,0 +1,1 @@
+ament_cmake_symlink_install_targets("TARGET_FILES" "/home/choigh/ws_cr_sf/build/cr_pjt/librobot_interface.a" "/home/choigh/ws_cr_sf/build/cr_pjt/robot_interface_test" "TARGETS" "robot_interface" "robot_interface_test" "DESTINATION" "lib/cr_pjt")
