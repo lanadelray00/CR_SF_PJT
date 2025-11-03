@@ -1,0 +1,14 @@
+build/
+install/
+log/
+.colcon/
+.vscode/
+__pycache__/
+*.pyc
+*.swp
+*.swo
+*.log
+*.db
+*.bak
+.DS_Store
+
