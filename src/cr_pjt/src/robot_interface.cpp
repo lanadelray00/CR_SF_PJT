@@ -8,13 +8,13 @@ RobotInterface::RobotInterface()
 {
   RCLCPP_INFO(this->get_logger(), "🚀 RobotInterface node initialized");
   
-  // Emergency Stop Service
+  // Emergency Stop Service initialization
   emergency_stop_srv_ = this->create_service<std_srvs::srv::Trigger>(
     "emergency_stop",
     std::bind(&RobotInterface::emergencyStopCallback, this, std::placeholders::_1, std::placeholders::_2)
   );
 
-  // ===== Gripper Action Client 초기화 =====
+  // Gripper Action Client initialization
   gripper_client_ = rclcpp_action::create_client<control_msgs::action::GripperCommand>(
     this, "/gripper_controller/gripper_cmd");
 
@@ -24,7 +24,8 @@ RobotInterface::RobotInterface()
   RCLCPP_INFO(this->get_logger(), "✅ Connected to GripperActionController");
 }
 
-// move group definition
+
+// Initialize MoveIt interface to control the 'arm'
 void RobotInterface::initMoveGroups()
 {
   auto node_shared = this->shared_from_this();
@@ -98,8 +99,9 @@ bool RobotInterface::sendGripperCommand(double position, double effort)
   goal_msg.command.max_effort = effort;   // 모터 토크 제한 (0=무제한)
 
   RCLCPP_INFO(this->get_logger(), "🚀 Sending gripper command (pos=%.3f)", position);
-
-  auto future_goal_handle = gripper_client_->async_send_goal(goal_msg);
+  
+  // gripper motion availability check
+  auto future_goal_handle = gripper_client_->async_send_goal(goal_msg); 
   if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), future_goal_handle)
       != rclcpp::FutureReturnCode::SUCCESS)
   {
@@ -113,7 +115,7 @@ bool RobotInterface::sendGripperCommand(double position, double effort)
     return false;
   }
 
-  // 결과 대기
+  // result stand by, result check
   auto result_future = gripper_client_->async_get_result(goal_handle);
   if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result_future)
       != rclcpp::FutureReturnCode::SUCCESS)
@@ -150,7 +152,8 @@ void RobotInterface::emergencyStopCallback(
   arm_group_->stop();
   
   if (gripper_client_ && gripper_client_->action_server_is_ready()) {
-    RCLCPP_WARN(this->get_logger(), "🛑 Attempting to stop gripper motion (if active)");
+    gripper_client_->async_cancel_all_goals();
+    RCLCPP_INFO(this->get_logger(), "✋ Sent cancel_all_goals() to gripper controller");
   }
   response->success = true;
   response->message = "Emergency stop activated — all motion halted.";
