@@ -12,9 +12,12 @@ endif()
 # Find ament packages and libraries for ament and system dependencies
 ################################################################################
 find_package(ament_cmake REQUIRED)
-find_package(moveit_ros_planning_interface REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(control_msgs REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(moveit_ros_planning_interface REQUIRED)
 find_package(std_srvs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 ################################################################################
 # Include directories
@@ -45,14 +48,20 @@ ament_target_dependencies(
   robot_interface
   "moveit_ros_planning_interface"
   "rclcpp"
+  "rclcpp_action"
   "std_srvs"
+  "control_msgs"
+  "geometry_msgs"
 )
 
 ament_target_dependencies(
   robot_interface_test
   "moveit_ros_planning_interface"
   "rclcpp"
+  "rclcpp_action"
   "std_srvs"
+  "control_msgs"
+  "geometry_msgs"
 )
 ################################################################################
 # Install

@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 
   node->initMoveGroups();  // ✅ 반드시 호출 (MoveGroup 초기화)
 
-  node->moveHome();
+  node->moveToNamedPose("home");
   node->openGripper();
   
   if (!node->moveToPose(0.2, 0.0, 0.25))
@@ -22,7 +22,7 @@ int main(int argc, char **argv)
   if (!node->moveToPose(0.15, 0.0, 0.2))
     RCLCPP_WARN(node->get_logger(), "➡️ Skip: Unreachable pose 4");
 
-  node->closeGripper();
+  node->closeGripper(0);
 
   rclcpp::shutdown();
   return 0;
