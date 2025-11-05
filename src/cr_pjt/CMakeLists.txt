@@ -18,6 +18,7 @@ find_package(rclcpp_action REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(crsf_interfaces REQUIRED)
 
 ################################################################################
 # Include directories
@@ -27,11 +28,15 @@ include_directories(include)
 ################################################################################
 # Build
 ################################################################################
-add_library(robot_interface src/robot_interface.cpp)
 
+# Source files - lib, exec, target
+# add_library(robot_interface src/robot_interface.cpp)
+
+add_executable(robot_interface src/robot_interface.cpp)
 add_executable(robot_interface_test src/robot_interface_test.cpp)
 
-target_link_libraries(robot_interface_test robot_interface)
+# target_link_libraries(robot_interface_test robot_interface)
+
 
 target_include_directories(robot_interface PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -52,6 +57,7 @@ ament_target_dependencies(
   "std_srvs"
   "control_msgs"
   "geometry_msgs"
+  "crsf_interfaces"
 )
 
 ament_target_dependencies(
@@ -62,6 +68,7 @@ ament_target_dependencies(
   "std_srvs"
   "control_msgs"
   "geometry_msgs"
+  "crsf_interfaces"
 )
 ################################################################################
 # Install

@@ -1,0 +1,7 @@
+# RobotInterfaceOneString
+# "open", "close" or numeric string between "-0.01 ~ 0.019"
+# "home", "init"
+string command    
+---
+bool success
+string message

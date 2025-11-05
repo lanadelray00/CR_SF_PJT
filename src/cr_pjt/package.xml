@@ -8,15 +8,27 @@
     allowing users to practice and experiment freely.
   </description>
   <maintainer email="choigh0396@gmail.com">choi</maintainer>
-  <license>Apache 2.0</license>
+  <license>Apache-2.0</license>
   <url type="website">WIP</url>
   <url type="repository">WIP</url>
   <url type="bugtracker">WIP</url>
   <author email="choigh0396@gmail.com">WIP</author>
+
+  <!-- Build tools -->
   <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Dependencies -->
   <depend>moveit_ros_planning_interface</depend>
+  <depend>rclcpp_action</depend>        
+  <depend>control_msgs</depend>         
   <depend>rclcpp</depend>
   <depend>std_srvs</depend>
+  <depend>crsf_interfaces</depend>
+
+  <!-- Testing -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>
