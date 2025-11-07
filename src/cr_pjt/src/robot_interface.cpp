@@ -2,7 +2,8 @@
 
 using namespace std::chrono_literals;
 
-// ROS2 node in
+// The robot_interface node interfaces with MoveIt's MoveGroupInterface and ros_control's GripperCommand
+// to execute actual motion and gripper control of the OpenManipulator.
 RobotInterface::RobotInterface()
 : Node("robot_interface")
 {
