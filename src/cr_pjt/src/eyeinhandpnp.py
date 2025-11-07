@@ -70,7 +70,7 @@ def run_aruco_detector(stop_event, shared_data, robot):
                 r_euler = R.from_matrix(R_base2marker)
                 roll, pitch, yaw = r_euler.as_euler('xyz', degrees=True)
                 # 정보 출력
-                robot.get_logger().info(f"ID {ids[i][0]} | X={bx:.3f} Y={by:.3f} Z={bz:.3f}")
+                # robot.get_logger().info(f"ID {ids[i][0]} | X={bx:.3f} Y={by:.3f} Z={bz:.3f}")
                 
                 if shared_data["record_mode"]:
                     shared_data["positions"].append((bx, by, bz))
@@ -96,7 +96,7 @@ def run_aruco_detector(stop_event, shared_data, robot):
         # 기록 중일 때 프레임 수 세기
         if shared_data["record_mode"]:
             shared_data["frame_count"] += 1
-            if shared_data["frame_count"] >= 60:
+            if shared_data["frame_count"] >= 30:
                 shared_data["record_mode"] = False
                 shared_data["trigger"] = True  # 평균 계산 트리거
 
@@ -125,17 +125,18 @@ def main():
             if shared_data["trigger"]:
                 shared_data["trigger"] = False  # 트리거 초기화
 
-                if len(shared_data["positions"]) < 60:
+                if len(shared_data["positions"]) < 10:
                     robot.get_logger().info("⚠️ Not enough frames collected.")
                     continue
 
                 # 60개 좌표의 평균 계산
                 xs, ys, zs = zip(*shared_data["positions"])
                 mean_x, mean_y, mean_z = np.mean(xs), np.mean(ys), np.mean(zs)
-                robot.get_logger().info(f"🎯 Moving to averaged position: X={mean_x:.3f}, Y={mean_y:.3f}, Z={mean_z:.3f}")
-
+                
                 # 로봇 이동 명령
+                robot.get_logger().info(f"🎯 Coordinate acquired: X={mean_x:.3f}, Y={mean_y:.3f}, Z={mean_z:.3f}")
                 robot.call_move_to_pose(mean_x, mean_y, mean_z, 0, 0, 0, 1)
+                
 
             rclpy.spin_once(robot, timeout_sec=0.1)
 
