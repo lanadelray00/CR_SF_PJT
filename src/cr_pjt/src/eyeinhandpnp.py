@@ -25,15 +25,20 @@ def run_aruco_detector(stop_event, shared_data, robot):
 
     # Hand-Eye Calibration Param
     R_cam2gripper = np.array([
-        [-0.06043361, -0.01568252,  0.99804902],
-        [-0.99776994, -0.02743505, -0.06084781],
-        [ 0.02833577, -0.99950056, -0.01398955]
-    ])
-    t_cam2gripper = np.array([[-0.06823299], [-0.01539078], [0.05938006]])  # [m]
+        [-0.04064111, -0.04163845,  0.99830583],
+        [-0.99870228, -0.02899864, -0.04186675],
+        [ 0.03069278, -0.99871183, -0.04040588]])
 
-    R_ee2cam = R_cam2gripper.T
-    t_ee2cam = -R_cam2gripper.T @ t_cam2gripper
-    T_ee2cam = np.vstack((np.hstack((R_ee2cam, t_ee2cam)), [0,0,0,1]))
+    t_cam2gripper = np.array([
+        [-0.12539297],
+        [ 0.08128996],
+        [ 0.08352949]])
+    
+    R_gripper2cam = R_cam2gripper.T
+    t_gripper2cam = -R_gripper2cam @ t_cam2gripper
+    
+
+    T_gripper2cam = np.vstack((np.hstack((R_gripper2cam, t_gripper2cam)), [0,0,0,1]))
 
     while not stop_event.is_set():
         ret, frame = cap.read()
@@ -49,28 +54,39 @@ def run_aruco_detector(stop_event, shared_data, robot):
             for i in range(len(ids)):
                 aruco.drawDetectedMarkers(frame, corners, ids)
                 cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvecs[i], tvecs[i], marker_length)
-                
-                rvec, tvec = rvecs[i], tvecs[i]       # 3x1, 3x1
-                R_cam2marker, _ = cv2.Rodrigues(rvec) # 3x3
-                T_cam2marker = np.vstack((np.hstack((R_cam2marker, tvec.T)), [0, 0, 0, 1]))
 
-                # base2EE
+                # marker2cam
+                rvec, tvec = rvecs[i], tvecs[i]       # 3x1, 3x1
+                tvec_cv = tvec.reshape(3, 1)
+                R_cv, _ = cv2.Rodrigues(rvec) # 3x3
+                # cam2marker Transform
+                R_cam2marker = R_cv.T
+                t_cam2marker = -R_cam2marker @ tvec_cv
+
+                T_cam2marker = np.vstack((np.hstack((R_cam2marker, t_cam2marker)), [0, 0, 0, 1]))
+
+                # gripper2Base
                 pose = robot.current_position
                 orient = robot.current_orientation  # roll, pitch, yaw
                 r = R.from_euler('xyz', orient, degrees=False)
-                R_base2ee = r.as_matrix()
-                t_base2ee = np.array(pose).reshape(3,1)
+                R_ee2base = r.as_matrix()
+                t_ee2base = np.array(pose).reshape(3,1)
+                # base2gripper
+                R_base2ee = R_ee2base.T
+                t_base2ee = -R_base2ee @ t_ee2base
+
                 T_base2ee = np.vstack((np.hstack((R_base2ee, t_base2ee)), [0,0,0,1]))
-                T_base2cam = T_base2ee @ T_ee2cam
 
                 # === 변환 ===
+                T_base2cam = T_base2ee @ T_gripper2cam
                 T_base2marker = T_base2cam @ T_cam2marker
+                
                 bx, by, bz = T_base2marker[:3, 3]
                 R_base2marker = T_base2marker[:3, :3]
                 r_euler = R.from_matrix(R_base2marker)
                 roll, pitch, yaw = r_euler.as_euler('xyz', degrees=True)
                 # 정보 출력
-                # robot.get_logger().info(f"ID {ids[i][0]} | X={bx:.3f} Y={by:.3f} Z={bz:.3f}")
+                robot.get_logger().info(f"ID {ids[i][0]} | X={bx:.3f} Y={by:.3f} Z={bz:.3f}")
                 
                 if shared_data["record_mode"]:
                     shared_data["positions"].append((bx, by, bz))
@@ -79,7 +95,7 @@ def run_aruco_detector(stop_event, shared_data, robot):
 
                 # 화면 표시용 텍스트
                 cX, cY = int(corners[i][0][0][0]), int(corners[i][0][0][1])
-                cv2.putText(frame, f"ID:{ids[i][0]} Z={bz:.2f}m", (cX, cY - 10),
+                cv2.putText(frame, f"ID:{ids[i][0]} X={bx:.2f}m Y={by:.2f}m Z={bz:.2f}m", (cX, cY - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
         cv2.imshow("Aruco Detection", frame)
@@ -121,7 +137,7 @@ def main():
     aruco_thread.start()
 
     try:
-        while not stop_event.is_set():
+        while True:
             if shared_data["trigger"]:
                 shared_data["trigger"] = False  # 트리거 초기화
 
@@ -141,7 +157,7 @@ def main():
             rclpy.spin_once(robot, timeout_sec=0.1)
 
     except KeyboardInterrupt:
-        pass
+        robot.get_logger().info("🛑 Program interrupted by user (ESC OR Ctrl+C)")
 
     stop_event.set()
     robot.get_logger().info("✅ All service tests completed.")
