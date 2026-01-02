@@ -35,6 +35,12 @@ public:
     // 5️⃣ 다시 init 자세로 이동
     callMoveToNamed("init");
 
+    // 1️⃣ Home 자세로 이동
+    callMoveToNamed("home");
+
+    // 2️⃣ 그리퍼 열기
+    callGripper("open");
+
     // 6️⃣ (테스트 종료 후) E-Stop 실행
     callEmergencyStop();
 

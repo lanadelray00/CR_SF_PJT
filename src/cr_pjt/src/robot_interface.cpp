@@ -4,8 +4,7 @@ using namespace std::chrono_literals;
 
 // The robot_interface node interfaces with MoveIt's MoveGroupInterface and ros_control's GripperCommand
 // to execute actual motion and gripper control of the OpenManipulator.
-RobotInterface::RobotInterface()
-: Node("robot_interface")
+RobotInterface::RobotInterface() : Node("robot_interface")
 {
   RCLCPP_INFO(this->get_logger(), "🚀 RobotInterface node initialized");
   

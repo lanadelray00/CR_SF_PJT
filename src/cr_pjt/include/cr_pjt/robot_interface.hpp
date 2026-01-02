@@ -14,9 +14,8 @@ class RobotInterface : public rclcpp::Node
 {
 public:
   RobotInterface();
-  void initMoveGroups();
 
-  
+  void initMoveGroups();
   void moveToNamedPose(const std::string &pose_name = "home");
 
 private:

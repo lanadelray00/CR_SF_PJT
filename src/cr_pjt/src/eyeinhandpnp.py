@@ -5,12 +5,13 @@ import threading
 from collections import deque
 import rclpy
 from robot_interface_client import RobotInterfaceClient
-from scipy.spatial.transform import Rotation as R
+from scipy.spatial.transform import Rotation
+import signal, os
 
 
 def run_aruco_detector(stop_event, shared_data, robot):
     # openCV & ArUco_marker initialization
-    cv2.setLogLevel(0) 
+    cv2.setLogLevel(0)
     cap = cv2.VideoCapture('/dev/video2')
 
     aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
@@ -20,26 +21,27 @@ def run_aruco_detector(stop_event, shared_data, robot):
     camera_matrix = data['mtx']
     dist_coeffs = data['dist']
     # set size of Marker
-    marker_length = 0.08
+    marker_length = 0.03
     robot.get_logger().info("📸 ArUco Detector Thread Started (ESC or Ctrl+C to exit)")
 
-    # Hand-Eye Calibration Param
+    # Hand-Eye Calibration Param T(c→g)
     R_cam2gripper = np.array([
-        [-0.04064111, -0.04163845,  0.99830583],
-        [-0.99870228, -0.02899864, -0.04186675],
-        [ 0.03069278, -0.99871183, -0.04040588]])
+        [-0.09837893,  0.16064060,  0.98209785],
+        [-0.99123926, -0.10321322, -0.08241218],
+        [ 0.08812674, -0.98160156,  0.16938727]
+    ])
 
     t_cam2gripper = np.array([
-        [-0.12539297],
-        [ 0.08128996],
-        [ 0.08352949]])
+        -0.05113446,
+        -0.00675610,
+        0.04876112
+    ]).reshape(3, 1)
     
-    R_gripper2cam = R_cam2gripper.T
-    t_gripper2cam = -R_gripper2cam @ t_cam2gripper
+    T_cam2gripper = np.eye(4)
+    T_cam2gripper[:3, :3] = R_cam2gripper
+    T_cam2gripper[:3,  3] = t_cam2gripper.reshape(3)
     
-
-    T_gripper2cam = np.vstack((np.hstack((R_gripper2cam, t_gripper2cam)), [0,0,0,1]))
-
+    # === Main loop ===
     while not stop_event.is_set():
         ret, frame = cap.read()
         if not ret:
@@ -47,45 +49,64 @@ def run_aruco_detector(stop_event, shared_data, robot):
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         corners, ids, rejected = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
-
+ 
         if ids is not None:
             rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(corners, marker_length, camera_matrix, dist_coeffs)
 
             for i in range(len(ids)):
                 aruco.drawDetectedMarkers(frame, corners, ids)
-                cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvecs[i], tvecs[i], marker_length)
+                obj_points = np.array([
+                    [-marker_length/2,  marker_length/2, 0],
+                    [ marker_length/2,  marker_length/2, 0],
+                    [ marker_length/2, -marker_length/2, 0],
+                    [-marker_length/2, -marker_length/2, 0]
+                ], dtype=np.float32)
+
+                # 2D 이미지 좌표 (detectMarkers() 결과)
+                img_points = corners[i][0].astype(np.float32)
+
+                # --- SolvePnP으로 pose 계산 ---
+                success, rvec, tvec = cv2.solvePnP(
+                    obj_points,
+                    img_points,
+                    camera_matrix,
+                    dist_coeffs
+                )
+
+                # cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvecs[i], tvecs[i], marker_length)
 
                 # marker2cam
                 rvec, tvec = rvecs[i], tvecs[i]       # 3x1, 3x1
-                tvec_cv = tvec.reshape(3, 1)
-                R_cv, _ = cv2.Rodrigues(rvec) # 3x3
-                # cam2marker Transform
-                R_cam2marker = R_cv.T
-                t_cam2marker = -R_cam2marker @ tvec_cv
+                t_target2cam = tvec.reshape(3, 1)
+                R_target2cam, _ = cv2.Rodrigues(rvec) # 3x3
 
-                T_cam2marker = np.vstack((np.hstack((R_cam2marker, t_cam2marker)), [0, 0, 0, 1]))
+                T_target2cam = np.eye(4)
+                T_target2cam[:3, :3] = R_target2cam
+                T_target2cam[:3,  3] = t_target2cam.reshape(3)
 
                 # gripper2Base
                 pose = robot.current_position
-                orient = robot.current_orientation  # roll, pitch, yaw
-                r = R.from_euler('xyz', orient, degrees=False)
-                R_ee2base = r.as_matrix()
-                t_ee2base = np.array(pose).reshape(3,1)
-                # base2gripper
-                R_base2ee = R_ee2base.T
-                t_base2ee = -R_base2ee @ t_ee2base
+                orient = robot.current_orientation  # Quaternian (qx, qy, qz, qw)
 
-                T_base2ee = np.vstack((np.hstack((R_base2ee, t_base2ee)), [0,0,0,1]))
+                if orient is None or len(orient) != 3:
+                    continue
+
+                R_gripper2base = Rotation.from_euler('xyz', orient, degrees=False).as_matrix()
+
+                T_gripper2base = np.eye(4)
+                T_gripper2base[:3, :3] = R_gripper2base
+                T_gripper2base[:3,  3] = np.array(pose)
 
                 # === 변환 ===
-                T_base2cam = T_base2ee @ T_gripper2cam
-                T_base2marker = T_base2cam @ T_cam2marker
+                T_cam2base = T_gripper2base @ T_cam2gripper
+                T_target2base = T_cam2base @ T_target2cam
                 
-                bx, by, bz = T_base2marker[:3, 3]
-                R_base2marker = T_base2marker[:3, :3]
-                r_euler = R.from_matrix(R_base2marker)
+                bx, by, bz = T_target2base[:3, 3]
+                R_base2target = T_target2base[:3, :3]
+                r_euler = Rotation.from_matrix(R_base2target)
                 roll, pitch, yaw = r_euler.as_euler('xyz', degrees=True)
-                # 정보 출력
+                
+                ################# terminal 정보 출력
                 robot.get_logger().info(f"ID {ids[i][0]} | X={bx:.3f} Y={by:.3f} Z={bz:.3f}")
                 
                 if shared_data["record_mode"]:
@@ -102,8 +123,11 @@ def run_aruco_detector(stop_event, shared_data, robot):
         key = cv2.waitKey(1) & 0xFF
         if key == 27:  # ESC to exit
             stop_event.set()  # ESC 키 누르면 스레드 종료
+            cap.release()                # 카메라 해제
+            cv2.destroyAllWindows()      # 모든 OpenCV 창 닫기
+            os.kill(os.getpid(), signal.SIGINT)
             break
-        elif key == 32 and not shared_data["record_mode"]:
+        elif key == 32 and not shared_data["record_mode"]: # space 누르면 기록 시작
             robot.get_logger().info("🟢 Recording marker position for 60 frames...")
             shared_data["positions"].clear()
             shared_data["record_mode"] = True
