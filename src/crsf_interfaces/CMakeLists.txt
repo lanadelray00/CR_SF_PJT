@@ -18,6 +18,7 @@ find_package(rosidl_default_generators REQUIRED)
 set(srv_files
   "srv/RobotInterfaceMovetopose.srv"
   "srv/RobotInterfaceOneString.srv"
+  "srv/RobotInterfaceBusy.srv"
   )
 
 # --------------------------------------------------

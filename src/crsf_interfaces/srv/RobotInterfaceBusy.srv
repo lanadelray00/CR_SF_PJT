@@ -1,0 +1,4 @@
+# RobotInterfaceBusy.srv
+
+---
+bool busy

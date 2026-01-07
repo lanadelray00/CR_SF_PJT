@@ -55,27 +55,9 @@ def run_aruco_detector(stop_event, shared_data, robot):
 
             for i in range(len(ids)):
                 aruco.drawDetectedMarkers(frame, corners, ids)
-                obj_points = np.array([
-                    [-marker_length/2,  marker_length/2, 0],
-                    [ marker_length/2,  marker_length/2, 0],
-                    [ marker_length/2, -marker_length/2, 0],
-                    [-marker_length/2, -marker_length/2, 0]
-                ], dtype=np.float32)
+                cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvecs[i], tvecs[i], marker_length)
 
-                # 2D 이미지 좌표 (detectMarkers() 결과)
-                img_points = corners[i][0].astype(np.float32)
-
-                # --- SolvePnP으로 pose 계산 ---
-                success, rvec, tvec = cv2.solvePnP(
-                    obj_points,
-                    img_points,
-                    camera_matrix,
-                    dist_coeffs
-                )
-
-                # cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs, rvecs[i], tvecs[i], marker_length)
-
-                # marker2cam
+                # Tmarker2cam
                 rvec, tvec = rvecs[i], tvecs[i]       # 3x1, 3x1
                 t_target2cam = tvec.reshape(3, 1)
                 R_target2cam, _ = cv2.Rodrigues(rvec) # 3x3
@@ -84,35 +66,34 @@ def run_aruco_detector(stop_event, shared_data, robot):
                 T_target2cam[:3, :3] = R_target2cam
                 T_target2cam[:3,  3] = t_target2cam.reshape(3)
 
-                # gripper2Base
+                # Tgripper2Base
                 pose = robot.current_position
                 orient = robot.current_orientation  # Quaternian (qx, qy, qz, qw)
 
-                if orient is None or len(orient) != 3:
+                if orient is None or len(orient) != 4:
                     continue
 
-                R_gripper2base = Rotation.from_euler('xyz', orient, degrees=False).as_matrix()
-
+                R_gripper2base = Rotation.from_quat(orient).as_matrix()
                 T_gripper2base = np.eye(4)
                 T_gripper2base[:3, :3] = R_gripper2base
                 T_gripper2base[:3,  3] = np.array(pose)
 
-                # === 변환 ===
+                # === coordinate change (Target to Base) ===
                 T_cam2base = T_gripper2base @ T_cam2gripper
                 T_target2base = T_cam2base @ T_target2cam
                 
                 bx, by, bz = T_target2base[:3, 3]
                 R_base2target = T_target2base[:3, :3]
-                r_euler = Rotation.from_matrix(R_base2target)
-                roll, pitch, yaw = r_euler.as_euler('xyz', degrees=True)
+                quat = Rotation.from_matrix(R_base2target).as_quat()
+                qx, qy, qz, qw = quat
+                # r_euler = Rotation.from_matrix(R_base2target)
+                # roll, pitch, yaw = r_euler.as_euler('xyz', degrees=True)
                 
                 ################# terminal 정보 출력
                 robot.get_logger().info(f"ID {ids[i][0]} | X={bx:.3f} Y={by:.3f} Z={bz:.3f}")
                 
                 if shared_data["record_mode"]:
-                    shared_data["positions"].append((bx, by, bz))
-
-
+                    shared_data["positions"].append((bx, by, bz, qx, qy, qz, qw))
 
                 # 화면 표시용 텍스트
                 cX, cY = int(corners[i][0][0][0]), int(corners[i][0][0][1])
@@ -170,12 +151,23 @@ def main():
                     continue
 
                 # 60개 좌표의 평균 계산
-                xs, ys, zs = zip(*shared_data["positions"])
-                mean_x, mean_y, mean_z = np.mean(xs), np.mean(ys), np.mean(zs)
+                xs, ys, zs, qx, qy, qz, qw = zip(*shared_data["positions"])
+                mean_x, mean_y, mean_z = round(np.mean(xs), 3), round(np.mean(ys), 3), round(np.mean(zs), 3)
+
                 
                 # 로봇 이동 명령
                 robot.get_logger().info(f"🎯 Coordinate acquired: X={mean_x:.3f}, Y={mean_y:.3f}, Z={mean_z:.3f}")
-                robot.call_move_to_pose(mean_x, mean_y, mean_z, 0, 0, 0, 1)
+
+                # if robot.call_check_ik(mean_x, mean_y, mean_z):
+                #     robot.call_move_to_pose(mean_x, mean_y, mean_z, qx[0], qy[0], qz[0], qw[0])
+                # else:
+                #     robot.get_logger().warn("❌ IK not reachable, trying adjustment")
+
+                success = robot.call_move_to_pose(mean_x, mean_y, mean_z, qx[0], qy[0], qz[0], qw[0])
+                if success:
+                    while robot.is_robot_busy():
+                        rclpy.spin_once(robot, timeout_sec=0.1)
+                    robot.call_move_to_named("home")
                 
 
             rclpy.spin_once(robot, timeout_sec=0.1)

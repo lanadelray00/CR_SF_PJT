@@ -2,16 +2,22 @@
 
 using namespace std::chrono_literals;
 
-// ROS2 node in
-RobotInterface::RobotInterface()
-: Node("robot_interface")
+// The robot_interface node interfaces with MoveIt's MoveGroupInterface and ros_control's GripperCommand
+// to execute actual motion and gripper control of the OpenManipulator.
+RobotInterface::RobotInterface() : Node("robot_interface")
 {
   RCLCPP_INFO(this->get_logger(), "🚀 RobotInterface node initialized");
   
-  // Emergency Stop Service initialization
-  emergency_stop_srv_ = this->create_service<std_srvs::srv::Trigger>(
-    "emergency_stop",
-    std::bind(&RobotInterface::emergencyStopCallback, this, std::placeholders::_1, std::placeholders::_2)
+  // moveToPose  service initialization
+  movetopose_srv_ = this->create_service<crsf_interfaces::srv::RobotInterfaceMovetopose>(
+    "move_to_pose",
+    std::bind(&RobotInterface::moveToPoseCallback, this, std::placeholders::_1, std::placeholders::_2)
+  );
+
+  // moveToNamedPose (home, init) service initialization
+  movetonamed_srv_ = this->create_service<crsf_interfaces::srv::RobotInterfaceOneString>(
+    "move_to_named",
+    std::bind(&RobotInterface::moveToNamedCallback, this, std::placeholders::_1, std::placeholders::_2)
   );
 
   // Gripper Action Client initialization
@@ -22,6 +28,18 @@ RobotInterface::RobotInterface()
     RCLCPP_INFO(this->get_logger(), "⏳ Waiting for /gripper_controller/gripper_cmd action server...");
   }
   RCLCPP_INFO(this->get_logger(), "✅ Connected to GripperActionController");
+  
+  // gripper control service initialization
+  gripper_ctrl_srv_ = this->create_service<crsf_interfaces::srv::RobotInterfaceOneString>(
+    "gripper_control",
+    std::bind(&RobotInterface::GripperctrlCallback, this, std::placeholders::_1, std::placeholders::_2)
+  );
+
+  // Emergency Stop Service initialization
+  emergency_stop_srv_ = this->create_service<std_srvs::srv::Trigger>(
+    "emergency_stop",
+    std::bind(&RobotInterface::emergencyStopCallback, this, std::placeholders::_1, std::placeholders::_2)
+  );
 }
 
 
@@ -37,24 +55,31 @@ void RobotInterface::initMoveGroups()
 }
 
 // arm move
-bool RobotInterface::moveToPose(double x, double y, double z,
-                                double qx, double qy, double qz, double qw)
+void RobotInterface::moveToPoseCallback(
+  const std::shared_ptr<crsf_interfaces::srv::RobotInterfaceMovetopose::Request> request,
+  std::shared_ptr<crsf_interfaces::srv::RobotInterfaceMovetopose::Response> response)
 {
   geometry_msgs::msg::Pose target_pose;
-  target_pose.position.x = x;
-  target_pose.position.y = y;
-  target_pose.position.z = z;
-  target_pose.orientation.x = qx;
-  target_pose.orientation.y = qy;
-  target_pose.orientation.z = qz;
-  target_pose.orientation.w = qw;
+  target_pose.position.x = request->x;
+  target_pose.position.y = request->y;
+  target_pose.position.z = request->z;
+  target_pose.orientation.x = request->qx;
+  target_pose.orientation.y = request->qy;
+  target_pose.orientation.z = request->qz;
+  target_pose.orientation.w = request->qw;
 
-  arm_group_->setPoseTarget(target_pose);
-  arm_group_->setGoalPositionTolerance(0.01);
-  arm_group_->setGoalOrientationTolerance(0.01);
+  // arm_group_->setPoseTarget(target_pose);
+
+  arm_group_->setPositionTarget(request->x, request->y, request->z);
+
+  arm_group_->setGoalPositionTolerance(0.05);
+  arm_group_->setGoalOrientationTolerance(0.05);
   arm_group_->setPlanningTime(5.0);
 
-  RCLCPP_INFO(this->get_logger(), "🟡 Planning path to (%.3f, %.3f, %.3f)", x, y, z);
+  // RCLCPP_INFO(this->get_logger(), "🟡 Planning path to (x=%.3f, y=%.3f, z=%.3f, qx=%.3f, qy=%.3f, qz=%.3f, qw=%.3f)", 
+  //             request->x, request->y, request->z, request->qx, request->qy, request->qz, request->qw);
+  RCLCPP_INFO(this->get_logger(), "🟡 Planning path to (x=%.3f, y=%.3f, z=%.3f)", 
+              request->x, request->y, request->z);
 
   moveit::planning_interface::MoveGroupInterface::Plan plan;
   auto error_code = arm_group_->plan(plan);
@@ -63,31 +88,46 @@ bool RobotInterface::moveToPose(double x, double y, double z,
   {
     RCLCPP_INFO(this->get_logger(), "✅ Planning success, executing...");
     arm_group_->execute(plan);
+    response->success = true;
+    response->message = "✅ MoveToPose executed successfully";
   }
   else
   {
     RCLCPP_WARN(this->get_logger(), "❌ Planning failed (code: %d)", error_code.val);
     arm_group_->stop();               
     arm_group_->clearPoseTargets();
-    return false;
+    
+    response->success = false;
+    response->message = "❌ MoveToPose planning failed";
   }
-
-  return true;
 }
 
 // move to customized set point 
-void RobotInterface::moveToNamedPose(const std::string &pose_name)
+void RobotInterface::moveToNamedCallback(
+  const std::shared_ptr<crsf_interfaces::srv::RobotInterfaceOneString::Request> request,
+  std::shared_ptr<crsf_interfaces::srv::RobotInterfaceOneString::Response> response)
 {
-  arm_group_->setNamedTarget(pose_name); //(default : home, option : init)
-  arm_group_->move();
-  RCLCPP_INFO(this->get_logger(), "📍 Moved to named pose: %s", pose_name.c_str());
+  std::string cmd = request->command;
+
+  if (cmd == "home" || cmd == "init") {
+    arm_group_->setNamedTarget(cmd); //(default : home, option : init)
+    arm_group_->move();
+    RCLCPP_INFO(this->get_logger(), "📍 Moved to named pose: %s", cmd.c_str());
+    response->success = true;
+    response->message = "✅ Moved to " + cmd + " pose";
+  }
+  else {
+    RCLCPP_WARN(this->get_logger(), "⚠️ Unknown named pose: %s", cmd.c_str());
+    response->success = false;
+    response->message = "❌ Invalid pose name (use: 'home' or 'init')";
+  }
 }
 
-// Gripper open, close
+//////////////////////////////////////gripper//////////////////////////////////////////////////////
+// Gripper control connector to ros_control
 bool RobotInterface::sendGripperCommand(double position, double effort)
 {
   using GripperCommand = control_msgs::action::GripperCommand;
-  using GoalHandleGripper = rclcpp_action::ClientGoalHandle<GripperCommand>;
 
   if (!gripper_client_->action_server_is_ready()) {
     RCLCPP_ERROR(this->get_logger(), "❌ Gripper action server not ready");
@@ -95,61 +135,67 @@ bool RobotInterface::sendGripperCommand(double position, double effort)
   }
 
   auto goal_msg = GripperCommand::Goal();
-  goal_msg.command.position = position;   // m 단위 (0.019=open, -0.01=close)
-  goal_msg.command.max_effort = effort;   // 모터 토크 제한 (0=무제한)
+  goal_msg.command.position = position;
+  goal_msg.command.max_effort = effort;
 
   RCLCPP_INFO(this->get_logger(), "🚀 Sending gripper command (pos=%.3f)", position);
-  
-  // gripper motion availability check
-  auto future_goal_handle = gripper_client_->async_send_goal(goal_msg); 
-  if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), future_goal_handle)
-      != rclcpp::FutureReturnCode::SUCCESS)
-  {
-    RCLCPP_ERROR(this->get_logger(), "❌ Failed to send gripper goal");
-    return false;
-  }
 
-  auto goal_handle = future_goal_handle.get();
-  if (!goal_handle) {
-    RCLCPP_WARN(this->get_logger(), "⚠️ Gripper goal rejected");
-    return false;
-  }
+  auto send_goal_options = rclcpp_action::Client<GripperCommand>::SendGoalOptions();
 
-  // result stand by, result check
-  auto result_future = gripper_client_->async_get_result(goal_handle);
-  if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result_future)
-      != rclcpp::FutureReturnCode::SUCCESS)
-  {
-    RCLCPP_ERROR(this->get_logger(), "❌ Failed to get gripper result");
-    return false;
-  }
+  send_goal_options.result_callback =
+    [this](const rclcpp_action::ClientGoalHandle<GripperCommand>::WrappedResult &result)
+    {
+      if (result.code == rclcpp_action::ResultCode::SUCCEEDED)
+        RCLCPP_INFO(this->get_logger(), "✅ Gripper moved successfully");
+      else
+        RCLCPP_WARN(this->get_logger(), "⚠️ Gripper action failed or was canceled");
+    };
 
-  auto result = result_future.get();
-  RCLCPP_INFO(this->get_logger(), "✅ Gripper moved (reached=%d)", result.result->reached_goal);
-  return result.result->reached_goal;
+  gripper_client_->async_send_goal(goal_msg, send_goal_options);
+  return true;
 }
 
-// Gripper open
-void RobotInterface::openGripper()
+///////////////////////actual gripper controller, open & close & depth
+void RobotInterface::GripperctrlCallback(
+  const std::shared_ptr<crsf_interfaces::srv::RobotInterfaceOneString::Request> request,
+  std::shared_ptr<crsf_interfaces::srv::RobotInterfaceOneString::Response> response)
 {
-  sendGripperCommand(0.019);  // SRDF 기준 open 위치 (-0.01, -0.005, 0, 0.005, 0.01, 0.01, 0.015, 0.019)
-  RCLCPP_INFO(this->get_logger(), "🤖 Gripper opened");
+  std::string cmd = request->command;
+  RCLCPP_INFO(this->get_logger(), "📨 Received gripper command: %s", cmd.c_str());
+
+  if (cmd == "open") {
+    sendGripperCommand(0.019);
+    response->success = true;
+    response->message = "🤖 Gripper opened";
+  } 
+  else if (cmd == "close") {
+    sendGripperCommand(-0.01);
+    response->success = true;
+    response->message = "✊ Gripper closed";
+  }
+  else {
+    try {
+      double pos = std::stod(cmd);  // 문자열을 double로 변환 시도
+      sendGripperCommand(pos);
+      response->success = true;
+      response->message = "✊ Gripper moved to custom position";
+    } catch (const std::invalid_argument &) {
+      response->success = false;
+      response->message = "❌ Invalid gripper command. Enter range -0.01 ~ 0.019";
+      RCLCPP_WARN(this->get_logger(), "⚠️ Unknown command: %s", cmd.c_str());
+    }
+  }
 }
-// Gripper close
-void RobotInterface::closeGripper(double position)
-{
-  sendGripperCommand(position);  // SRDF 기준 close 위치 (min : -0.01)
-  RCLCPP_INFO(this->get_logger(), "✊ Gripper closed(pos=%.3f)", position);
-}
-
-
-
+//////////////////////////////////////gripper//////////////////////////////////////////////////////
+// E-Stop
 void RobotInterface::emergencyStopCallback(
   const std_srvs::srv::Trigger::Request::SharedPtr,
   const std_srvs::srv::Trigger::Response::SharedPtr response)
 {
   if (arm_group_)
   arm_group_->stop();
+  arm_group_->clearPoseTargets();
+  rclcpp::sleep_for(500ms);
   
   if (gripper_client_ && gripper_client_->action_server_is_ready()) {
     gripper_client_->async_cancel_all_goals();
@@ -158,4 +204,17 @@ void RobotInterface::emergencyStopCallback(
   response->success = true;
   response->message = "Emergency stop activated — all motion halted.";
   RCLCPP_WARN(this->get_logger(), "🛑 EMERGENCY STOP TRIGGERED!");
+}
+
+int main(int argc, char **argv)
+{
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<RobotInterface>();
+
+  // MoveGroup 초기화 (필수)
+  node->initMoveGroups();
+
+  rclcpp::spin(node);
+  rclcpp::shutdown();
+  return 0;
 }
