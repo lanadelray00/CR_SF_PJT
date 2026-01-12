@@ -1,4 +1,4 @@
-#include "cr_pjt/robot_interface.hpp"
+#include "test_pkg/robot_interface.hpp"
 
 using namespace std::chrono_literals;
 
@@ -25,12 +25,6 @@ RobotInterface::RobotInterface() : Node("robot_interface")
     "move_to_named",
     std::bind(&RobotInterface::moveToNamedCallback, this, std::placeholders::_1, std::placeholders::_2)
   );
-
-  isbusy_srv_ = this->create_service<crsf_interfaces::srv::RobotInterfaceBusy>(
-    "is_busy",
-    std::bind(&RobotInterface::isBusyCallback, this, std::placeholders::_1, std::placeholders::_2)
-  );
-
 
   // Gripper Action Client initialization
   gripper_client_ = rclcpp_action::create_client<control_msgs::action::GripperCommand>(
@@ -71,15 +65,7 @@ void RobotInterface::moveToPoseCallback(
   const std::shared_ptr<crsf_interfaces::srv::RobotInterfaceMovetopose::Request> request,
   std::shared_ptr<crsf_interfaces::srv::RobotInterfaceMovetopose::Response> response)
 {
-
-  if (is_executing_) {  // ← 이동 중이면 거절
-    response->success = false;
-    response->message = "Robot is busy";
-    return;
-  }
-
   {
-  std::lock_guard<std::mutex> lock(target_mutex_);
   target_pose_.position.x = request->x;
   target_pose_.position.y = request->y;
   target_pose_.position.z = request->z;
@@ -102,20 +88,11 @@ void RobotInterface::moveToPoseCallback(
 // Pose 기반 이동 실행 (콜백 밖)
 void RobotInterface::executeMoveTask()
 {
-  if (is_executing_) return;
-  is_executing_ = true; 
 
-  geometry_msgs::msg::Pose pose;
-  {
-    std::lock_guard<std::mutex> lock(target_mutex_);
-    pose = target_pose_;
-  }
+  arm_group_->setPoseTarget(target_pose_);
 
-  arm_group_->setPoseTarget(pose);
-
-  arm_group_->setStartStateToCurrentState();   // seed
-  arm_group_->setGoalPositionTolerance(0.05);
-  arm_group_->setGoalOrientationTolerance(M_PI);
+  arm_group_->setGoalPositionTolerance(0.001);
+  arm_group_->setGoalOrientationTolerance(0.001);
   arm_group_->setPlanningTime(5.0);
 
   
@@ -131,7 +108,6 @@ void RobotInterface::executeMoveTask()
   }
 
   arm_group_->clearPoseTargets();
-  is_executing_ = false;
 }
 
 // IK check
@@ -169,22 +145,12 @@ void RobotInterface::moveToNamedCallback(
   const std::shared_ptr<crsf_interfaces::srv::RobotInterfaceOneString::Request> request,
   std::shared_ptr<crsf_interfaces::srv::RobotInterfaceOneString::Response> response)
 {
-  if (is_executing_) {  // ← 이동 중이면 거절
-    response->success = false;
-    response->message = "Robot is busy";
-    return;
-  }
-  // init, home, ground, gound_1, ground_2
   if (request->command != "home" && request->command != "init") {
     response->success = false;
     response->message = "Invalid named pose";
     return;
   }
-
-  {
-    std::lock_guard<std::mutex> lock(target_mutex_);
-    target_named_pose_ = request->command;
-  }
+  target_named_pose_ = request->command;
 
   std::thread(&RobotInterface::executeNamedMoveTask, this).detach();  
   // ↑ 콜백 밖 실행
@@ -196,30 +162,13 @@ void RobotInterface::moveToNamedCallback(
 // Named pose 이동 실행 (콜백 밖)
 void RobotInterface::executeNamedMoveTask()
 {
-  if (is_executing_) return;
-  is_executing_ = true; 
-
   std::string pose_name;
-  {
-    std::lock_guard<std::mutex> lock(target_mutex_);
-    pose_name = target_named_pose_;
-  }
+  pose_name = target_named_pose_;
+
 
   arm_group_->setNamedTarget(pose_name);
   arm_group_->move();
-
-  is_executing_ = false;
 }
-
-// Task check
-void RobotInterface::isBusyCallback(
-  const std::shared_ptr<crsf_interfaces::srv::RobotInterfaceBusy::Request>,
-  std::shared_ptr<crsf_interfaces::srv::RobotInterfaceBusy::Response> response)
-{
-  response->busy = is_executing_;
-}
-
-
 
 //////////////////////////////////////gripper//////////////////////////////////////////////////////
 // Gripper control connector to ros_control
@@ -294,8 +243,6 @@ void RobotInterface::emergencyStopCallback(
     arm_group_->stop();
     arm_group_->clearPoseTargets();
   }
-  
-  is_executing_ = false;   // ← ★중요: 상태 강제 리셋★
 
   if (gripper_client_ && gripper_client_->action_server_is_ready()) {
     gripper_client_->async_cancel_all_goals();

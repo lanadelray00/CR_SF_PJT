@@ -1,4 +1,4 @@
-#include "cr_pjt/robot_interface.hpp"
+#include "test_pkg/robot_interface.hpp"
 
 using namespace std::chrono_literals;
 
@@ -21,28 +21,35 @@ public:
     waitForServers();
 
     // 1️⃣ Home 자세로 이동
-    callMoveToNamed("ground_2");
-
-    // // 2️⃣ 그리퍼 열기
-    // callGripper("open");
-    
-
-    // // 3️⃣ 특정 Pose로 이동
-    // callMoveToPose(0.2, 0.0, 0.25, 0, 0, 0, 1);
-
-    // // 4️⃣ 그리퍼 닫기
-    // callGripper("close");
-
-    // // 5️⃣ 다시 init 자세로 이동
-    // callMoveToNamed("init");
-
-    // // 1️⃣ Home 자세로 이동
     // callMoveToNamed("home");
 
-    // // 2️⃣ 그리퍼 열기
-    // callGripper("open");
+    // 2️⃣ 그리퍼 열기
+    callGripper("open");
+    RCLCPP_INFO(this->get_logger(), "1");
+    rclcpp::sleep_for(500ms);   // 0.5초 대기
 
-    // // 6️⃣ (테스트 종료 후) E-Stop 실행
+    // 3️⃣ 특정 Pose로 이동
+    // callMoveToPose(0.3, 0, 0.1, 0, 0, 0, 1);
+
+    // 4️⃣ 그리퍼 닫기
+    callGripper("close");
+    RCLCPP_INFO(this->get_logger(), "2");
+    rclcpp::sleep_for(500ms);   // 0.5초 대기
+    // 5️⃣ 다시 init 자세로 이동
+    callMoveToNamed("init");
+    RCLCPP_INFO(this->get_logger(), "3");
+    rclcpp::sleep_for(3000ms);   // 0.5초 대기
+
+    // 1️⃣ Home 자세로 이동
+    callMoveToNamed("home");
+    RCLCPP_INFO(this->get_logger(), "4");
+    rclcpp::sleep_for(2000ms);   // 0.5초 대기
+
+    // 2️⃣ 그리퍼 열기
+    callGripper("open");
+    RCLCPP_INFO(this->get_logger(), "5");
+
+    // 6️⃣ (테스트 종료 후) E-Stop 실행
     // callEmergencyStop();
 
     RCLCPP_INFO(this->get_logger(), "✅ All service tests completed.");
