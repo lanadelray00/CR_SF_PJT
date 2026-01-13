@@ -3,7 +3,6 @@ import numpy as np
 import cv2.aruco as aruco
 import threading
 from collections import deque
-import time
 import math
 import rclpy
 import tf_transformations

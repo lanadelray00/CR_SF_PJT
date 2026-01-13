@@ -1,0 +1,10 @@
+# Goal
+float64 position
+float64 max_effort
+---
+# Result
+bool success
+string message
+---
+# Feedback
+string state

@@ -10,6 +10,7 @@ endif()
 # --------------------------------------------------
 find_package(ament_cmake REQUIRED)
 find_package(builtin_interfaces REQUIRED)
+find_package(geometry_msgs REQUIRED)   
 find_package(rosidl_default_generators REQUIRED)
 
 # --------------------------------------------------
@@ -21,12 +22,20 @@ set(srv_files
   "srv/RobotInterfaceBusy.srv"
   )
 
+set(action_files
+  "action/MoveToPose.action"
+  "action/MoveToNamed.action"
+  "action/GripperControl.action"
+  "action/EmergencyStop.action"
+)
+
 # --------------------------------------------------
 # Generate Interface Code
 # --------------------------------------------------
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${srv_files}
-  DEPENDENCIES builtin_interfaces
+  ${action_files}
+  DEPENDENCIES builtin_interfaces geometry_msgs
   )
 
 # --------------------------------------------------

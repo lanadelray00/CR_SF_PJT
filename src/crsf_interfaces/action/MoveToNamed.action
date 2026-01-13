@@ -1,0 +1,9 @@
+# Goal
+string name       # home / init
+---
+# Result
+bool success
+string message
+---
+# Feedback
+string state

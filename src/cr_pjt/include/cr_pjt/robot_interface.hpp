@@ -1,84 +1,78 @@
 #pragma once
-#include <rclcpp/rclcpp.hpp>
-#include <rclcpp_action/rclcpp_action.hpp>
-#include <control_msgs/action/gripper_command.hpp>
-#include <moveit/move_group_interface/move_group_interface.h>
-#include <std_srvs/srv/trigger.hpp>
-#include <geometry_msgs/msg/pose.hpp>
 
-#include <atomic>
-#include <mutex>
+#include <memory>
+#include <string>
 #include <thread>
 
-// MoveIt core (IK check용)
-#include <moveit/robot_state/robot_state.h>
-#include <moveit/robot_model/robot_model.h>
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
 
-// Custom Interfaces
-#include "crsf_interfaces/srv/robot_interface_movetopose.hpp"
-#include "crsf_interfaces/srv/robot_interface_one_string.hpp"
-#include "crsf_interfaces/srv/robot_interface_busy.hpp"
+#include "geometry_msgs/msg/pose.hpp"
+#include "control_msgs/action/gripper_command.hpp"
 
+#include "moveit/move_group_interface/move_group_interface.h"
+
+#include "crsf_interfaces/action/move_to_pose.hpp"
+#include "crsf_interfaces/action/move_to_named.hpp"
+#include "crsf_interfaces/action/gripper_control.hpp"
+#include "crsf_interfaces/action/emergency_stop.hpp"
 
 class RobotInterface : public rclcpp::Node
 {
 public:
   RobotInterface();
-
   void initMoveGroups();
-  void moveToNamedPose(const std::string &pose_name = "home");
 
 private:
-  // Service callbacks
-  void emergencyStopCallback(
-    const std_srvs::srv::Trigger::Request::SharedPtr,
-    std_srvs::srv::Trigger::Response::SharedPtr response);
-  
-  void moveToPoseCallback(
-    const std::shared_ptr<crsf_interfaces::srv::RobotInterfaceMovetopose::Request> request,
-    std::shared_ptr<crsf_interfaces::srv::RobotInterfaceMovetopose::Response> response);
+  using MoveToPose = crsf_interfaces::action::MoveToPose;
+  using MoveToNamed = crsf_interfaces::action::MoveToNamed;
+  using GripperControl = crsf_interfaces::action::GripperControl;
+  using EmergencyStop = crsf_interfaces::action::EmergencyStop;
 
-  void checkIKCallback(
-    const std::shared_ptr<crsf_interfaces::srv::RobotInterfaceMovetopose::Request> request,
-    std::shared_ptr<crsf_interfaces::srv::RobotInterfaceMovetopose::Response> response);
+  using GoalHandleMoveToPose = rclcpp_action::ServerGoalHandle<MoveToPose>;
+  using GoalHandleMoveToNamed = rclcpp_action::ServerGoalHandle<MoveToNamed>;
+  using GoalHandleGripper = rclcpp_action::ServerGoalHandle<GripperControl>;
+  using GoalHandleEStop = rclcpp_action::ServerGoalHandle<EmergencyStop>;
 
-  void isBusyCallback(
-    const std::shared_ptr<crsf_interfaces::srv::RobotInterfaceBusy::Request>,
-    std::shared_ptr<crsf_interfaces::srv::RobotInterfaceBusy::Response> response);
-  
-  void GripperctrlCallback(
-    const std::shared_ptr<crsf_interfaces::srv::RobotInterfaceOneString::Request> request,
-    std::shared_ptr<crsf_interfaces::srv::RobotInterfaceOneString::Response> response);
-
-  void moveToNamedCallback(
-    const std::shared_ptr<crsf_interfaces::srv::RobotInterfaceOneString::Request> request,
-    std::shared_ptr<crsf_interfaces::srv::RobotInterfaceOneString::Response> response);
-
-  // Internal gripper action
-  bool sendGripperCommand(double position, double effort = 0.0);
-
-  // Member
+  // MoveIt
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> arm_group_;
-  rclcpp_action::Client<control_msgs::action::GripperCommand>::SharedPtr gripper_client_;
-  // Service Member
-  rclcpp::Service<crsf_interfaces::srv::RobotInterfaceMovetopose>::SharedPtr movetopose_srv_;
-  rclcpp::Service<crsf_interfaces::srv::RobotInterfaceMovetopose>::SharedPtr check_ik_srv_;
-  rclcpp::Service<crsf_interfaces::srv::RobotInterfaceOneString>::SharedPtr movetonamed_srv_;
-  rclcpp::Service<crsf_interfaces::srv::RobotInterfaceBusy>::SharedPtr isbusy_srv_;
-  rclcpp::Service<crsf_interfaces::srv::RobotInterfaceOneString>::SharedPtr gripper_ctrl_srv_;
-  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr emergency_stop_srv_;
 
-  // MoveIt 실행 상태 플래그
-  std::atomic<bool> is_executing_{false};
-  // 목표 pose 저장 (pose / named)
-  geometry_msgs::msg::Pose target_pose_;
-  std::string target_named_pose_;
-  std::mutex target_mutex_;
-  // 실제 MoveIt 실행 함수 (콜백 밖)
-  void executeMoveTask();          // pose 이동
-  void executeNamedMoveTask();     // named pose 이동
-  
+  // Action Servers
+  rclcpp_action::Server<MoveToPose>::SharedPtr move_to_pose_server_;
+  rclcpp_action::Server<MoveToNamed>::SharedPtr move_to_named_server_;
+  rclcpp_action::Server<GripperControl>::SharedPtr gripper_server_;
+  rclcpp_action::Server<EmergencyStop>::SharedPtr estop_server_;
 
+  // Gripper HW Action Client
+  rclcpp_action::Client<control_msgs::action::GripperCommand>::SharedPtr gripper_hw_client_;
 
- 
+  // ===== MoveToPose =====
+  rclcpp_action::GoalResponse handleMoveToPoseGoal(
+    const rclcpp_action::GoalUUID &,
+    std::shared_ptr<const MoveToPose::Goal> goal);
+
+  void executeMoveToPose(const std::shared_ptr<GoalHandleMoveToPose> goal_handle);
+
+  // ===== MoveToNamed =====
+  rclcpp_action::GoalResponse handleMoveToNamedGoal(
+    const rclcpp_action::GoalUUID &,
+    std::shared_ptr<const MoveToNamed::Goal> goal);
+
+  void executeMoveToNamed(const std::shared_ptr<GoalHandleMoveToNamed> goal_handle);
+
+  // ===== Gripper =====
+  rclcpp_action::GoalResponse handleGripperGoal(
+    const rclcpp_action::GoalUUID &,
+    std::shared_ptr<const GripperControl::Goal> goal);
+
+  void executeGripper(const std::shared_ptr<GoalHandleGripper> goal_handle);
+
+  bool sendGripperCommand(double position, double effort);
+
+  // ===== Emergency Stop =====
+  rclcpp_action::GoalResponse handleEStopGoal(
+    const rclcpp_action::GoalUUID &,
+    std::shared_ptr<const EmergencyStop::Goal> goal);
+
+  void executeEmergencyStop(const std::shared_ptr<GoalHandleEStop> goal_handle);
 };

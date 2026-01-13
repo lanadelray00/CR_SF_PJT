@@ -19,6 +19,9 @@
    
   <!-- Group declaration for interface packages -->
   <member_of_group>rosidl_interface_packages</member_of_group>
+  
+  <!-- Dependencies -->
+  <depend>geometry_msgs</depend>
 
   <!-- Testing dependencies -->
   <test_depend>ament_lint_auto</test_depend>

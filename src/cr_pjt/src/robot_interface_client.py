@@ -1,129 +1,199 @@
 import rclpy
 from rclpy.node import Node
-from crsf_interfaces.srv import RobotInterfaceMovetopose, RobotInterfaceOneString, RobotInterfaceBusy
-from std_srvs.srv import Trigger
+from rclpy.action import ActionClient
+
+from crsf_interfaces.action import (
+    MoveToPose,
+    MoveToNamed,
+    GripperControl,
+    EmergencyStop,
+)
 
 from moveit_msgs.srv import GetPositionFK
 from moveit_msgs.msg import RobotState
 from sensor_msgs.msg import JointState
-from scipy.spatial.transform import Rotation as R
 
-# The robot_interface_client node communicates with the robot_interface node 
-# to send service requests for controlling the OpenManipulator 
+
 class RobotInterfaceClient(Node):
     def __init__(self):
         super().__init__('robot_interface_client')
-        self.get_logger().info("🧪 robot_interface_client Node initialized")
+        self.get_logger().info("🧪 robot_interface_client (Action-based) initialized")
 
-        # 서비스 클라이언트 생성
-        self.move_to_pose_client = self.create_client(RobotInterfaceMovetopose, 'move_to_pose')
-        self.check_ik_client = self.create_client(RobotInterfaceMovetopose, 'check_ik')
-        self.move_to_named_client = self.create_client(RobotInterfaceOneString, 'move_to_named')
-        self.is_busy_cli = self.create_client(RobotInterfaceBusy, "is_busy")
-        self.gripper_client = self.create_client(RobotInterfaceOneString, 'gripper_control')
-        self.emergency_client = self.create_client(Trigger, 'emergency_stop')
+        # ===============================
+        # Action Clients
+        # ===============================
+        self.move_to_pose_client = ActionClient(self, MoveToPose, 'move_to_pose')
+        self.move_to_named_client = ActionClient(self, MoveToNamed, 'move_to_named')
+        self.gripper_client = ActionClient(self, GripperControl, 'gripper_control')
+        self.emergency_client = ActionClient(self, EmergencyStop, 'emergency_stop')
 
-        # ✅ FK 서비스 클라이언트 & JointState 구독자 추가
+        # ===============================
+        # FK Service & JointState
+        # ===============================
         self.fk_client = self.create_client(GetPositionFK, '/compute_fk')
-        self.subscription = self.create_subscription(JointState, '/joint_states', self.joint_callback, 10)
+        self.subscription = self.create_subscription(
+            JointState, '/joint_states', self.joint_callback, 10
+        )
 
-        # 현재 EE pose 저장용
         self.current_position = None
-        self.current_orientation = None  # roll, pitch, yaw
+        self.current_orientation = None
 
         self.wait_for_servers()
 
+    # ======================================================
+    # Wait for Action Servers
+    # ======================================================
     def wait_for_servers(self):
-        self.get_logger().info("⏳ Waiting for all service servers...")
-        for c in [self.move_to_pose_client, self.check_ik_client, self.move_to_named_client, self.gripper_client, self.emergency_client, self.fk_client]:
-            c.wait_for_service()
-        self.get_logger().info("✅ All service servers available.")
+        self.get_logger().info("⏳ Waiting for action servers...")
 
+        self.move_to_pose_client.wait_for_server()
+        self.move_to_named_client.wait_for_server()
+        self.gripper_client.wait_for_server()
+        self.emergency_client.wait_for_server()
+        self.fk_client.wait_for_service()
+
+        self.get_logger().info("✅ All action servers available")
+
+    # ======================================================
+    # MoveToPose Action
+    # ======================================================
     def call_move_to_pose(self, x, y, z, qx, qy, qz, qw):
-        req = RobotInterfaceMovetopose.Request()
-        req.x, req.y, req.z = float(x), float(y), float(z)
-        # req.qx, req.qy, req.qz, req.qw = float(qx), float(qy), float(qz), float(qw)
-        future = self.move_to_pose_client.call_async(req)
-        rclpy.spin_until_future_complete(self, future)
-        if future.result():
-            self.get_logger().info(f"✅ move_to_pose result: {future.result().message}")
-        else:
-            self.get_logger().error("❌ Failed to get move_to_pose response")
+        goal = MoveToPose.Goal()
+        goal.target_pose.position.x = float(x)
+        goal.target_pose.position.y = float(y)
+        goal.target_pose.position.z = float(z)
+        goal.target_pose.orientation.x = float(qx)
+        goal.target_pose.orientation.y = float(qy)
+        goal.target_pose.orientation.z = float(qz)
+        goal.target_pose.orientation.w = float(qw)
 
-    def call_check_ik(self, x, y, z):
-        req = RobotInterfaceMovetopose.Request()
-        req.x = float(x)
-        req.y = float(y)
-        req.z = float(z)
+        send_goal_future = self.move_to_pose_client.send_goal_async(
+            goal, feedback_callback=self.move_to_pose_feedback
+        )
+        send_goal_future.add_done_callback(self.move_to_pose_response)
 
-        future = self.check_ik_client.call_async(req)
-        rclpy.spin_until_future_complete(self, future)
+    def move_to_pose_feedback(self, feedback):
+        self.get_logger().info(f"📡 MoveToPose feedback: {feedback.feedback.state}")
 
-        if future.result() is not None:
-            if future.result().success:
-                self.get_logger().info(f"✅ IK reachable at ({x:.3f}, {y:.3f}, {z:.3f})")
-                return True
-            else:
-                self.get_logger().warn(
-                    f"❌ IK NOT reachable at ({x:.3f}, {y:.3f}, {z:.3f}) : "
-                    f"{future.result().message}"
-                )
-                return False
-        else:
-            self.get_logger().error("❌ Failed to call check_ik service")
-            return False
+    def move_to_pose_response(self, future):
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().error("❌ MoveToPose goal rejected")
+            return
 
-    def call_move_to_named(self, name):
-        req = RobotInterfaceOneString.Request()
-        req.command = name
-        future = self.move_to_named_client.call_async(req)
-        rclpy.spin_until_future_complete(self, future)
-        if future.result():
-            self.get_logger().info(f"✅ move_to_named result: {future.result().message}")
-        else:
-            self.get_logger().error("❌ Failed to get call_move_to_named response")
+        self.get_logger().info("✅ MoveToPose goal accepted")
+        result_future = goal_handle.get_result_async()
+        result_future.add_done_callback(self.move_to_pose_result)
 
+    def move_to_pose_result(self, future):
+        result = future.result().result
+        self.get_logger().info(f"🏁 MoveToPose result: {result.message}")
 
-    def is_robot_busy(self) -> bool:
-        req = RobotInterfaceBusy.Request()
-        future = self.is_busy_cli.call_async(req)
-
-        rclpy.spin_until_future_complete(self, future)
-
-        if future.result() is not None:
-            return future.result().busy
-        else:
-            self.get_logger().warn("❌ Failed to call is_busy service")
-            return True  # 안전하게 busy 처리
+    def move_to_pose_and_wait(self, x, y, z, qx, qy, qz, qw):
+        goal = MoveToPose.Goal()
+        goal.target_pose.position.x = x
+        goal.target_pose.position.y = y
+        goal.target_pose.position.z = z
+        goal.target_pose.orientation.x = qx
+        goal.target_pose.orientation.y = qy
+        goal.target_pose.orientation.z = qz
+        goal.target_pose.orientation.w = qw
+        return self.send_and_wait(self.move_to_pose_client, goal)
 
 
+    # ======================================================
+    # MoveToNamed Action
+    # ======================================================
+    def call_move_to_named(self, name: str):
+        goal = MoveToNamed.Goal()
+        goal.name = name
 
-    def call_gripper(self, cmd):
-        req = RobotInterfaceOneString.Request()
-        req.command = cmd
-        future = self.gripper_client.call_async(req)
-        rclpy.spin_until_future_complete(self, future)
-        if future.result():
-            self.get_logger().info(f"🤖 call_gripper result: {future.result().message}")
-        else:
-            self.get_logger().error("❌ Failed to get call_gripper response")
+        future = self.move_to_named_client.send_goal_async(goal)
+        future.add_done_callback(self.move_to_named_response)
+
+    def move_to_named_response(self, future):
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().error("❌ MoveToNamed goal rejected")
+            return
+
+        result_future = goal_handle.get_result_async()
+        result_future.add_done_callback(self.move_to_named_result)
+
+    def move_to_named_result(self, future):
+        result = future.result().result
+        self.get_logger().info(f"🏁 MoveToNamed result: {result.message}")
+
+    def move_to_named_and_wait(self, name):
+        goal = MoveToNamed.Goal()
+        goal.name = name
+        return self.send_and_wait(self.move_to_named_client, goal)
 
 
+    # ======================================================
+    # Gripper Action
+    # ======================================================
+    def call_gripper(self, position: float, effort: float = 5.0):
+        goal = GripperControl.Goal()
+        goal.position = float(position)
+        goal.max_effort = float(effort)
+
+        future = self.gripper_client.send_goal_async(goal)
+        future.add_done_callback(self.gripper_response)
+
+    def gripper_response(self, future):
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().error("❌ Gripper goal rejected")
+            return
+
+        result_future = goal_handle.get_result_async()
+        result_future.add_done_callback(self.gripper_result)
+
+    def gripper_result(self, future):
+        result = future.result().result
+        self.get_logger().info(f"✊ Gripper result: {result.message}")
+
+    def gripper_and_wait(self, position, effort=5.0):
+        goal = GripperControl.Goal()
+        goal.position = position
+        goal.max_effort = effort
+        return self.send_and_wait(self.gripper_client, goal)
+
+
+    # ======================================================
+    # Emergency Stop Action
+    # ======================================================
     def call_emergency_stop(self):
-        req = Trigger.Request()
-        future = self.emergency_client.call_async(req)
-        rclpy.spin_until_future_complete(self, future)
-        if future.result():
-            self.get_logger().info(f"🛑 call_emergency_stop result: {future.result().message}")
-            
-    # ✅ FK 계산 콜백
+        goal = EmergencyStop.Goal()
+        goal.stop = True
+
+        future = self.emergency_client.send_goal_async(goal)
+        future.add_done_callback(self.emergency_response)
+
+    def emergency_response(self, future):
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().error("❌ EmergencyStop rejected")
+            return
+
+        result_future = goal_handle.get_result_async()
+        result_future.add_done_callback(self.emergency_result)
+
+    def emergency_result(self, future):
+        result = future.result().result
+        self.get_logger().warn(f"🛑 Emergency stop: {result.message}")
+
+    # ======================================================
+    # FK Calculation (unchanged)
+    # ======================================================
     def joint_callback(self, msg):
         if not self.fk_client.service_is_ready():
             return
 
         request = GetPositionFK.Request()
-        request.header.frame_id = 'world'   # base 좌표계 이름
-        request.fk_link_names = ['end_effector_link']  # EE 링크 이름 수정 필요
+        request.header.frame_id = 'world'
+        request.fk_link_names = ['end_effector_link']
         robot_state = RobotState()
         robot_state.joint_state = msg
         request.robot_state = robot_state
@@ -134,21 +204,44 @@ class RobotInterfaceClient(Node):
     def fk_response_callback(self, future):
         try:
             response = future.result()
-            if len(response.pose_stamped) > 0:
+            if response.pose_stamped:
                 pose = response.pose_stamped[0].pose
-                x, y, z = pose.position.x, pose.position.y, pose.position.z
-                qx, qy, qz, qw = (
+                self.current_position = [
+                    pose.position.x,
+                    pose.position.y,
+                    pose.position.z,
+                ]
+                self.current_orientation = [
                     pose.orientation.x,
                     pose.orientation.y,
                     pose.orientation.z,
-                    pose.orientation.w
-                )
-
-                # 업데이트
-                self.current_position = [x, y, z]
-                self.current_orientation = [qx, qy, qz, qw]
-
-            else:
-                self.get_logger().warn("No FK result returned.")
+                    pose.orientation.w,
+                ]
         except Exception as e:
             self.get_logger().error(f"FK call failed: {e}")
+    
+    # ======================================================
+    # FK Calculation (unchanged)
+    # ======================================================
+    def send_and_wait(self, action_client, goal):
+        future = action_client.send_goal_async(goal)
+        rclpy.spin_until_future_complete(self, future)
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            return False
+
+        result_future = goal_handle.get_result_async()
+        rclpy.spin_until_future_complete(self, result_future)
+        return True
+
+
+def main():
+    rclpy.init()
+    node = RobotInterfaceClient()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
