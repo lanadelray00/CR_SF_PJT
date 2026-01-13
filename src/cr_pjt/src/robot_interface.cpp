@@ -115,7 +115,7 @@ void RobotInterface::executeMoveTask()
 
   arm_group_->setStartStateToCurrentState();   // seed
   arm_group_->setGoalPositionTolerance(0.05);
-  arm_group_->setGoalOrientationTolerance(M_PI);
+  arm_group_->setGoalOrientationTolerance(0.05);
   arm_group_->setPlanningTime(5.0);
 
   

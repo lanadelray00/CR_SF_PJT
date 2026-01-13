@@ -29,14 +29,18 @@ public:
     rclcpp::sleep_for(500ms);   // 0.5초 대기
 
     // 3️⃣ 특정 Pose로 이동
+    callMoveToPose(0.251, 0.039, 0.012, 0.702, 0.083, -0.702, 0.083);
     // callMoveToPose(0.3, 0, 0.1, 0, 0, 0, 1);
+    
+    rclcpp::sleep_for(5000ms);   // 0.5초 대기
 
     // 4️⃣ 그리퍼 닫기
-    callGripper("close");
+    callGripper("-0.003");
     RCLCPP_INFO(this->get_logger(), "2");
     rclcpp::sleep_for(500ms);   // 0.5초 대기
+
     // 5️⃣ 다시 init 자세로 이동
-    callMoveToNamed("init");
+    callMoveToNamed("ground_2");
     RCLCPP_INFO(this->get_logger(), "3");
     rclcpp::sleep_for(3000ms);   // 0.5초 대기
 

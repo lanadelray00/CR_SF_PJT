@@ -91,8 +91,8 @@ void RobotInterface::executeMoveTask()
 
   arm_group_->setPoseTarget(target_pose_);
 
-  arm_group_->setGoalPositionTolerance(0.001);
-  arm_group_->setGoalOrientationTolerance(0.001);
+  arm_group_->setGoalPositionTolerance(0.01);
+  arm_group_->setGoalOrientationTolerance(0.01);
   arm_group_->setPlanningTime(5.0);
 
   

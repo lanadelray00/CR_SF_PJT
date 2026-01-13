@@ -3,8 +3,11 @@ import numpy as np
 import cv2.aruco as aruco
 import threading
 from collections import deque
+import time
+import math
 import rclpy
 import tf_transformations
+from tf_transformations import quaternion_from_euler
 from robot_interface_client import RobotInterfaceClient
 from scipy.spatial.transform import Rotation
 import signal, os
@@ -92,6 +95,7 @@ def run_aruco_detector(stop_event, shared_data, robot):
 
                 ################# terminal 정보 출력
                 # robot.get_logger().info(f"ID {ids[i][0]} | X={bx:.3f} Y={by:.3f} Z={bz:.3f}")
+                # robot.get_logger().info(f"{roll, pitch, yaw}")
                 
                 if shared_data["record_mode"]:
                     shared_data["positions"].append((bx, by, bz, qx, qy, qz, qw))
@@ -151,17 +155,18 @@ def main():
                 # 60개 좌표의 평균 계산
                 xs, ys, zs, qx, qy, qz, qw = zip(*shared_data["positions"])
                 mean_x, mean_y, mean_z = round(np.mean(xs), 3), round(np.mean(ys), 3), round(np.mean(zs), 3)
-                # mean_z = mean_z + float(0.01)
-                roll_m, pitch_m, yaw_m = tf_transformations.euler_from_quaternion([qx[0], qy[0], qz[0], qw[0]])
+                mean_z = mean_z + float(0.01)
+                yaw = math.atan2(mean_y, mean_x)
+                pitch = math.pi / 2
+
                 # 2️⃣ EE orientation 구성
-                #   Pitch = +π/2 (지면 향하게), Yaw = 마커 yaw 방향 정렬
-                q_ee = tf_transformations.quaternion_from_euler(0, 1.5708, yaw_m)
+                #   Pitch = +π/2 (지면 향하게), `````````````````````````````````````````````````````````````````````````Yaw = 마커 yaw 방향 정렬
+                q_ee = tf_transformations.quaternion_from_euler(0, pitch, yaw)
                 
                 # 로봇 이동 명령
-                # robot.get_logger().info(f"🎯 Coordinate acquired: X={mean_x}, Y={mean_y}, Z={mean_z}")
                 robot.get_logger().info(f"🎯 {mean_x}, {mean_y}, {mean_z}, {q_ee[0]:.3f}, {q_ee[1]:.3f}, {q_ee[2]:.3f}, {q_ee[3]:.3f}")
-
                 robot.call_move_to_pose(mean_x, mean_y, mean_z, q_ee[0], q_ee[1], q_ee[2], q_ee[3])
+                # robot.call_move_to_pose(mean_x, mean_y, mean_z, 0, 0, 0, 1)
 
                 
 
