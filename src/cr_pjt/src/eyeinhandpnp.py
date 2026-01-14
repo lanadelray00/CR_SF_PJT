@@ -113,15 +113,18 @@ def run_aruco_detector(stop_event, shared_data, robot):
             os.kill(os.getpid(), signal.SIGINT)
             break
         elif key == 32 and not shared_data["record_mode"]: # space 누르면 기록 시작
-            robot.get_logger().info("🟢 Recording marker position for 60 frames...")
+            robot.get_logger().info("🟢 Recording marker position for 30 frames...")
             shared_data["positions"].clear()
+            robot.get_logger().info("🟢 check point1")
             shared_data["record_mode"] = True
+            robot.get_logger().info("🟢 check point2")
 
         # 기록 중일 때 프레임 수 세기
         if shared_data["record_mode"]:
             if len(shared_data["positions"]) >= 30:
                 shared_data["record_mode"] = False
                 shared_data["trigger"] = True  # 평균 계산 트리거
+                robot.get_logger().info(f"🟢 check point3, {shared_data['trigger'], shared_data['record_mode']}")
 
     cap.release()
     cv2.destroyAllWindows()
@@ -145,6 +148,7 @@ def main():
     try:
         while True:
             if shared_data["trigger"]:
+                robot.get_logger().info("🟢 check point4")
                 shared_data["trigger"] = False  # 트리거 초기화
 
                 if len(shared_data["positions"]) < 30:
@@ -164,14 +168,21 @@ def main():
                 
                 # 로봇 이동 명령
                 robot.get_logger().info(f"🎯 {mean_x}, {mean_y}, {mean_z}, {q_ee[0]:.3f}, {q_ee[1]:.3f}, {q_ee[2]:.3f}, {q_ee[3]:.3f}")
-                
+                robot.get_logger().info("🟢 check point5")
+
                 robot.gripper_and_wait(0.019)
-                robot.move_to_pose_and_wait(mean_x, mean_y, mean_z, q_ee[0], q_ee[1], q_ee[2], q_ee[3])
+                success = robot.move_to_pose_and_wait(mean_x, mean_y, mean_z, q_ee[0], q_ee[1], q_ee[2], q_ee[3])
+                if not success:
+                    robot.get_logger().error("❌ MoveToPose failed → sequence aborted")
+                    shared_data["record_mode"] = False
+                    shared_data["trigger"] = False
+                    shared_data["positions"].clear()
+                    continue   # 🔥 여기서 시퀀스 종료
+                
                 robot.gripper_and_wait(-0.004)
                 robot.move_to_named_and_wait("home")
                 robot.gripper_and_wait(0.019)
                 robot.move_to_named_and_wait("ground_2")
-
 
                 # robot.call_move_to_pose(mean_x, mean_y, mean_z, 0, 0, 0, 1)
 

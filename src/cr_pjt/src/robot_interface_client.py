@@ -1,6 +1,10 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
+from action_msgs.msg import GoalStatus
+from moveit_msgs.srv import GetPositionFK
+from moveit_msgs.msg import RobotState
+from sensor_msgs.msg import JointState
 
 from crsf_interfaces.action import (
     MoveToPose,
@@ -8,10 +12,6 @@ from crsf_interfaces.action import (
     GripperControl,
     EmergencyStop,
 )
-
-from moveit_msgs.srv import GetPositionFK
-from moveit_msgs.msg import RobotState
-from sensor_msgs.msg import JointState
 
 
 class RobotInterfaceClient(Node):
@@ -221,17 +221,40 @@ class RobotInterfaceClient(Node):
             self.get_logger().error(f"FK call failed: {e}")
     
     # ======================================================
-    # FK Calculation (unchanged)
+    # Send_and_wait
     # ======================================================
     def send_and_wait(self, action_client, goal):
         future = action_client.send_goal_async(goal)
         rclpy.spin_until_future_complete(self, future)
         goal_handle = future.result()
-        if not goal_handle.accepted:
+
+        if not goal_handle or not goal_handle.accepted:
+            self.get_logger().error("❌ Goal rejected")
             return False
 
+        # 2️⃣ 결과 대기
         result_future = goal_handle.get_result_async()
         rclpy.spin_until_future_complete(self, result_future)
+
+        wrapped_result = result_future.result()
+        status = wrapped_result.status 
+        result = wrapped_result.result
+
+        # 3️⃣ 상태 코드 확인 (가장 중요)
+        if status != GoalStatus.STATUS_SUCCEEDED:
+            self.get_logger().error(
+                f"❌ Action failed (status={status}, message={getattr(result, 'message', '')})"
+            )
+            return False        
+
+        # 4️⃣ result.success 확인 (MoveToPose / Gripper 등)
+        if hasattr(result, "success") and not result.success:
+            self.get_logger().error(
+                f"❌ Action reported failure: {result.message}"
+            )
+            return False
+
+        self.get_logger().info(f"✅ Action succeeded: {getattr(result, 'message', '')}")
         return True
 
 

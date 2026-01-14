@@ -88,13 +88,15 @@ void RobotInterface::executeMoveToPose(
     result->error_code = code.val;
     result->message = "Planning failed";
     goal_handle->abort(result);
+    arm_group_->clearPoseTargets();
     return;
   }
 
   feedback->state = "EXECUTING";
   goal_handle->publish_feedback(feedback);
 
-  arm_group_->move();
+  // arm_group_->move();
+  arm_group_->execute(plan);
 
   result->success = true;
   result->error_code = 0;
