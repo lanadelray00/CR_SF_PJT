@@ -135,6 +135,12 @@ def main():
     rclpy.init()
     robot = RobotInterfaceClient()
 
+    robot.get_logger().info("🚀 Moving to initial pose: ground_2")
+    success = robot.move_to_named_and_wait("ground_2")
+    if not success:
+        robot.get_logger().error("❌ Failed to move to ground_2 at startup")
+        return
+
     shared_data = {
         "positions": deque(maxlen=30),
         "trigger": False,
@@ -178,9 +184,10 @@ def main():
                     shared_data["trigger"] = False
                     shared_data["positions"].clear()
                     continue   # 🔥 여기서 시퀀스 종료
-                
                 robot.gripper_and_wait(-0.004)
-                robot.move_to_named_and_wait("home")
+                robot.move_to_named_and_wait("pick_1")
+                robot.move_to_named_and_wait("place_2")
+                robot.move_to_named_and_wait("place_1")
                 robot.gripper_and_wait(0.019)
                 robot.move_to_named_and_wait("ground_2")
 
