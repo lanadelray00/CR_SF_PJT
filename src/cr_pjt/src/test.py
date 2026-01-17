@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import rclpy
-from robot_interface_client import RobotInterfaceClient
+from cr_pjt.scripts.robot_interface_client import RobotInterfaceClient
 
 def main():
     rclpy.init()

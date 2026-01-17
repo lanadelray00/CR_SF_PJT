@@ -7,9 +7,18 @@ import math
 import rclpy
 import tf_transformations
 from tf_transformations import quaternion_from_euler
-from robot_interface_client import RobotInterfaceClient
 from scipy.spatial.transform import Rotation
+from ament_index_python.packages import get_package_share_directory
+import sys
 import signal, os
+
+
+pkg_root = os.path.dirname(os.path.dirname(__file__))
+scripts_dir = os.path.join(pkg_root, 'scripts')
+sys.path.insert(0, scripts_dir)
+from robot_interface_client import RobotInterfaceClient
+
+
 
 
 def run_aruco_detector(stop_event, shared_data, robot):
@@ -19,8 +28,10 @@ def run_aruco_detector(stop_event, shared_data, robot):
 
     aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
     parameters = aruco.DetectorParameters()
-
-    data = np.load('/home/choigh/ws_cr_sf/src/cr_pjt/src/config/calib_data.npz')
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    calib_path = os.path.join(parent_dir, 'config', 'calib_data.npz')
+    data = np.load(calib_path)
     camera_matrix = data['mtx']
     dist_coeffs = data['dist']
     # set size of Marker
@@ -161,7 +172,7 @@ def main():
                     robot.get_logger().info("⚠️ Not enough frames collected.")
                     continue
 
-                # 60개 좌표의 평균 계산
+                # 30개 좌표의 평균 계산
                 xs, ys, zs, qx, qy, qz, qw = zip(*shared_data["positions"])
                 mean_x, mean_y, mean_z = round(np.mean(xs), 3), round(np.mean(ys), 3), round(np.mean(zs), 3)
                 mean_z = mean_z + float(0.01)

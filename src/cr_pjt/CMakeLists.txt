@@ -4,15 +4,27 @@
 cmake_minimum_required(VERSION 3.8)
 project(cr_pjt)
 
+# Default to C99
+if(NOT CMAKE_C_STANDARD)
+  set(CMAKE_C_STANDARD 99)
+endif()
+
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 ################################################################################
-# Find ament packages and libraries for ament and system dependencies
+# Find dependencies
 ################################################################################
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
 find_package(control_msgs REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
@@ -21,42 +33,28 @@ find_package(geometry_msgs REQUIRED)
 find_package(crsf_interfaces REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
 
-
 ################################################################################
-# Include directories
+# Include cpp header directory
 ################################################################################
 include_directories(include)
 
 ################################################################################
-# Build
+# Create cpp executable
 ################################################################################
-
-# Source files - lib, exec, target
-# add_library(robot_interface src/robot_interface.cpp)
-
 add_executable(robot_interface src/robot_interface.cpp)
 # add_executable(robot_interface_test src/robot_interface_test.cpp)
 # add_executable(simple_setposetarget src/simple_setposetarget.cpp)
 
-# target_link_libraries(robot_interface_test robot_interface)
-
-
+################################################################################
+# Export header include paths
+################################################################################
 target_include_directories(robot_interface PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-# target_include_directories(robot_interface_test PUBLIC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#   $<INSTALL_INTERFACE:include>)
-
-# target_include_directories(simple_setposetarget PUBLIC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#   $<INSTALL_INTERFACE:include>)
-
-target_compile_features(robot_interface PUBLIC c_std_99 cxx_std_17)
-# target_compile_features(robot_interface_test PUBLIC c_std_99 cxx_std_17)
-# target_compile_features(simple_setposetarget PUBLIC c_std_99 cxx_std_17)
-
+################################################################################
+# Declare ROS 2/MoveIt dependencies (headers, libraries, and runtime linking)
+################################################################################
 ament_target_dependencies(
   robot_interface
   "moveit_ros_planning_interface"
@@ -91,12 +89,34 @@ ament_target_dependencies(
 # )
 
 ################################################################################
-# Install
+# Install cpp executable
 ################################################################################
 install(TARGETS robot_interface
   # robot_interface_test
   # simple_setposetarget
   DESTINATION lib/${PROJECT_NAME})
+
+################################################################################
+# install python modules
+################################################################################
+# ament_python_install_package(${PROJECT_NAME})
+
+################################################################################
+# install python executables
+################################################################################
+install(PROGRAMS
+  scripts/open_manipulator_x_pickandplace.py
+  scripts/keyboard_trigger_node.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+################################################################################
+# install config files (calibration, yaml, npz, etc.)
+################################################################################
+install(
+  DIRECTORY config
+  DESTINATION share/${PROJECT_NAME}
+)
 
 ################################################################################
 # Macro for ament package

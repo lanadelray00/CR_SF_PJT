@@ -9,19 +9,18 @@
   </description>
   <maintainer email="choigh0396@gmail.com">choi</maintainer>
   <license>Apache-2.0</license>
-  <url type="website">WIP</url>
-  <url type="repository">WIP</url>
-  <url type="bugtracker">WIP</url>
   <author email="choigh0396@gmail.com">WIP</author>
 
   <!-- Build tools -->
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
 
   <!-- Dependencies -->
+  <depend>rclcpp</depend>
+  <depend>rclpy</depend>
   <depend>moveit_ros_planning_interface</depend>
   <depend>rclcpp_action</depend>        
   <depend>control_msgs</depend>         
-  <depend>rclcpp</depend>
   <depend>std_srvs</depend>
   <depend>crsf_interfaces</depend>
 
